@@ -3,4 +3,4 @@ Group Project ~Kawaii~
 
 ## Requirements
 * Download and Install Qt from: http://www.qt.io/download-open-source/
-* Run makefile
+* Run .pro file
