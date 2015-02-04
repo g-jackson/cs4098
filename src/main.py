@@ -2,7 +2,7 @@ import sys
 from PyQt4 import QtGui
 
 def main():
-    
+    print "KAWAII Patient Records"
     app = QtGui.QApplication(sys.argv)
 
     w = QtGui.QWidget()
