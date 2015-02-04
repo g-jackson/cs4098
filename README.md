@@ -27,3 +27,9 @@ Group Project ~Kawaii~
   sudo apt-get update
   ```
 * Run .pro file
+
+## Running the Program
+* Navigate to the src folder
+* ```qmake``` to create the Makefile
+* ```make``` to run the Makefile
+* ```./cs4098``` to run the program
