@@ -26,9 +26,11 @@ Group Project ~Kawaii~
   ```
   sudo apt-get update
   ```
+  
+## Running the Program on Windows
 * Run .pro file
 
-## Running the Program
+## Running the Program on Linux
 * Navigate to the src folder
 * ```qmake``` to create the Makefile
 * ```make``` to run the Makefile
