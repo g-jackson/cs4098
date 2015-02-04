@@ -3,5 +3,12 @@ Group Project ~Kawaii~
 
 ## Requirements
 * Download and Install Qt from: http://www.qt.io/download-open-source/
+* sudo apt-get install synaptic
+* sudo apt-get install qt4-dev-tools libqt4-dev libqt4-core libqt4-gui
+* sudo -s chmod u+x QtSdk-offline-linux-x86_64-v1.2.1.run
+* sudo -s ./QtSdk-offline-linux-x86_64-v1.2.1.run -style cleanlooks
+* Install Qtsdk in /opt
+* sudo -s chmod -R 777 /opt/QtSDK 
 * apt-get install mysql-server-5.6
+* sudo apt-get update
 * Run .pro file
