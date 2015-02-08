@@ -1,3 +1,24 @@
-This is a list of tasks that need to be done if you want to do them cut them from this file and paste them into your own.
+This is a list of tasks that need to be done if you want to do them copy them from this file and paste them into your own.
 Maintain the format task / pamplemousse sessions
 
+Real EMR Interface						20
+
+Pathway Support							30
+	- 	XML Parsing						15
+	-	Presentation					15
+
+Pathway View							75
+	-	Graph Layout					30
+	-	Refinement						30
+	-	Pan/Zoom						15
+
+Mobile Friendly							45
+	-	tablet test						5
+	-	phone							40
+
+Kernel Interface						15
+
+HL7 Support								12+
+	-	EMR Export						6
+	-	Script Understanding			6
+	-	Script Per Reasource			2
