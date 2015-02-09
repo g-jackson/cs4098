@@ -1,6 +1,9 @@
 This is a list of tasks that need to be done if you want to do them copy them from this file and paste them into your own.
 Maintain the format task / pamplemousse sessions
 
+Major Release Tasks
+-------------------------------------------
+
 Real EMR Interface						20
 
 Pathway Support							30
@@ -22,3 +25,9 @@ HL7 Support								12+
 	-	EMR Export						6
 	-	Script Understanding			6
 	-	Script Per Reasource			2
+
+
+Smaller Tasks
+-------------------------------------------
+
+
