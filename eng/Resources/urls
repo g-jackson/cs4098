@@ -1,0 +1,6 @@
+/patients = page of all patients and their pathways i.e pathway support
+/patients/patientid = specific patient's pathways
+/patients/patientid/pathwayid = specific patient's pathway
+
+/pathways = list of all available the pathways in the system
+/pathways/add = input form for patway via pml
