@@ -1,0 +1,12 @@
+To install program on a fresh Ubuntu 14.04 build the following dependancies must be met:
+install git
+install byacc
+install bison
+install tcl-dev
+install flex
+install check
+install libreadlin-dev
+install libncurses5-devel
+install libxml2
+install libxml2-dev
+install openssl
