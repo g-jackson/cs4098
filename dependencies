@@ -10,3 +10,7 @@ install libncurses5-devel
 install libxml2
 install libxml2-dev
 install openssl
+git clone https://github.com/g-jackson/cs4098
+
+Full Listing:
+sudo apt-get install git byacc bison tcl-dev flex check libreadlin-dev libncurses5-devel libxml2 libxml2-dev openssl
