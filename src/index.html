@@ -25,10 +25,11 @@
 	xmlhttp.send();
 	xmlDoc = xmlhttp.responseXML;
 
-	document.write("<table><tr><th>Patient Name</th><th>Blood Type</th><th>Diagnosis</th></tr><tr><td>");
-	var x = xmlDoc.getElementsByTagName("record");
+	document.write("<table><tr><th>Patient Name</th><th>Blood Type</th><th>Diagnosis</th></tr>");
+	var x = xmlDoc.getElementsByTagName("patient_record");
 	for (i = 0; i < x.length; i++)
 		{
+		document.write("<tr><td>");
 		document.write(x[i].getElementsByTagName("name")[0].childNodes[0].nodeValue);
 		document.write("</td><td>");
 		document.write(x[i].getElementsByTagName("blood_type")[0].childNodes[0].nodeValue);

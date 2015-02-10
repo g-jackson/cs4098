@@ -1,5 +1,12 @@
-<record>
-	<name>Emma Carrigan</name>
-	<blood_type>O+</blood_type>
-	<diagnosis>TOO AWESOME</diagnosis>
-</record>
+<records>
+	<patient_record>
+		<name>Emma Carrigan</name>
+		<blood_type>O+</blood_type>
+		<diagnosis>TOO AWESOME</diagnosis>
+	</patient_record>
+	<patient_record>
+		<name>Blemma Snarrigan</name>
+		<blood_type>O+</blood_type>
+		<diagnosis>Also pretty great</diagnosis>
+	</patient_record>
+</records>
