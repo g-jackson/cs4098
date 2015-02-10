@@ -1,7 +1,15 @@
 {
-  "nodes":[
-    {"name":"blocked_action","state":0},
-    {"name":"ready_action","state":1},
-	{"name":"complete_action","state":2}
-  ]
+	"nodes":[
+		{"name":"complete_action","state":2},
+		{"name":"complete_action","state":2},
+		{"name":"complete_action","state":2},	
+		{"name":"ready_action","state":1},
+		{"name":"blocked_action","state":0}
+	],
+	"links":[
+		{"source":0, "target":3},
+		{"source":1, "target":3},
+		{"source":2, "target":3},
+		{"source":3, "target":4}
+	]
 }
