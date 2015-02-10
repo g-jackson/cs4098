@@ -1,0 +1,7 @@
+{
+  "nodes":[
+    {"name":"blocked_action","state":0},
+    {"name":"ready_action","state":1},
+	{"name":"complete_action","state":2}
+  ]
+}
