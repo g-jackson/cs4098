@@ -7,7 +7,7 @@
 # ifndef SCANNER_H
 # define SCANNER_H
 # include <pml/features.h>
-#include <stdio.h>
+# include <stdio.h>
 /* Variable declarations */
 extern int lineno;
 extern String filename;
