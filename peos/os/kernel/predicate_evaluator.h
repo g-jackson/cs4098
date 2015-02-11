@@ -2,9 +2,9 @@
 #ifndef _PREDICATE_EVALUATOR_H
 #define _PREDICATE_EVALUATOR_H
 #define USE_INTERP_RESULT
-#include <tcl/tcl.h>
+#include </usr/include/tcl.h>
 #ifndef _TCL
-#include "/home/jntestuser/tcl_install/include/tcl.h"
+#include <tcl/tcl.h>
 #endif
 #include <pml/tree.h>
 #include "action.h"

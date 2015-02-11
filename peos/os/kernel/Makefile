@@ -64,7 +64,7 @@ $(LIBRARY): $(OBJS)
 # Compile the program
 shell: shell.o $(LIBRARY)
 
-	$(CC) $(LDFLAGS) -o $@ $< $(CORE_LIBS) $(LIBS) -lreadline -lhistory -ltermcap -ltcl	
+	$(CC) $(LDFLAGS) -o $@ $< $(CORE_LIBS) $(LIBS) -lreadline -lhistory -lncurses -ltcl	
 
 
 # Unit tests.

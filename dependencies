@@ -1,4 +1,6 @@
 To install program on a fresh Ubuntu 14.04 build the following dependancies must be met:
+
+Libraries:
 install git
 install byacc
 install bison
@@ -10,7 +12,35 @@ install libncurses5-devel
 install libxml2
 install libxml2-dev
 install openssl
-git clone https://github.com/g-jackson/cs4098
 
-Full Listing:
+Full Listing of libraries:
 sudo apt-get install git byacc bison tcl-dev flex check libreadlin-dev libncurses5-devel libxml2 libxml2-dev openssl
+
+Run:
+git clone https://github.com/g-jackson/cs4098
+cd cs4098/peos/pml 
+make
+cd ../../..
+cd /cs4098/peos/os/kernel 
+make lib
+
+====================================================================================================================
+
+To install program on Windows using Cygwin:
+
+Add the following libraries in the cygwin setup.exe:
+git 
+byacc 
+bison 
+tcl-dev 
+flex 
+check 
+libreadlin-dev 
+libncurses5-devel 
+libxml2 
+libxml2-dev 
+openssl
+pthread
+
+
+

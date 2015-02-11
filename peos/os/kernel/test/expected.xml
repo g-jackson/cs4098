@@ -1,0 +1,65 @@
+<process_table>
+<process pid="0" model="test.pml" status="4">
+<selection>
+<sequence>
+<action name="act_0" state="READY">
+<script>
+script
+</script>
+<req_resource name="r1" value="r1val" qualifier="abstract"></req_resource>
+<req_resource name="r2" value="r2val" qualifier=""></req_resource>
+<prov_resource name="r1" value="r1val" qualifier="abstract"></prov_resource>
+<prov_resource name="r2" value="r2val" qualifier=""></prov_resource>
+</action>
+</sequence>
+<sequence>
+<branch>
+<sequence>
+<action name="act_1" state="READY">
+<script>
+script
+</script>
+<req_resource name="r1" value="r1val" qualifier="abstract"></req_resource>
+<req_resource name="r2" value="r2val" qualifier=""></req_resource>
+<prov_resource name="r1" value="r1val" qualifier="abstract"></prov_resource>
+<prov_resource name="r2" value="r2val" qualifier=""></prov_resource>
+</action>
+</sequence>
+<sequence>
+<action name="act_2" state="READY">
+<script>
+script
+</script>
+<req_resource name="r1" value="r1val" qualifier="abstract"></req_resource>
+<req_resource name="r2" value="r2val" qualifier=""></req_resource>
+<prov_resource name="r1" value="r1val" qualifier="abstract"></prov_resource>
+<prov_resource name="r2" value="r2val" qualifier=""></prov_resource>
+</action>
+</sequence>
+</branch>
+</sequence>
+<sequence>
+<iteration>
+<action name="act_3" state="READY">
+<script>
+script
+</script>
+<req_resource name="r1" value="r1val" qualifier="abstract"></req_resource>
+<req_resource name="r2" value="r2val" qualifier=""></req_resource>
+<prov_resource name="r1" value="r1val" qualifier="abstract"></prov_resource>
+<prov_resource name="r2" value="r2val" qualifier=""></prov_resource>
+</action>
+<action name="act_4" state="READY">
+<script>
+script
+</script>
+<req_resource name="r1" value="r1val" qualifier="abstract"></req_resource>
+<req_resource name="r2" value="r2val" qualifier=""></req_resource>
+<prov_resource name="r1" value="r1val" qualifier="abstract"></prov_resource>
+<prov_resource name="r2" value="r2val" qualifier=""></prov_resource>
+</action>
+</iteration>
+</sequence>
+</selection>
+</process>
+</process_table>
