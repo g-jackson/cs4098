@@ -24,6 +24,18 @@ cd ../../..
 cd /cs4098/peos/os/kernel 
 make lib
 
+
+You should get an error related to the file y.tab.h. 
+	Locate the file y.tab.h in pml/pml folder 
+	Open it with a text editor that displays the line numbers (like Notepad++) 	
+	At line 39 replace #if with #ifdef 
+	Save the file 
+
+retry the above make
+
+
+make peos
+
 ====================================================================================================================
 
 To install program on Windows using Cygwin:
@@ -59,4 +71,4 @@ You should get an error related to the file y.tab.h.
 retry the above make
 
 
-
+make peos
