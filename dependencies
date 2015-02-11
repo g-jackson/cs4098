@@ -35,8 +35,8 @@ bison
 tcl-dev 
 flex 
 check 
-libreadlin-dev 
-libncurses5-devel 
+libreadline-dev 
+libncurses5-dev
 libxml2 
 libxml2-dev 
 openssl
