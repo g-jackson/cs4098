@@ -8,13 +8,13 @@
 }
 
 .link {
-	stroke: #999;
+	stroke: #888;
 	stroke-width: 2px;
 }
 
 marker#arrow {
-    stroke: #999;
-    fill: #999;
+    stroke: #888;
+    fill: #888;
 }
 
 </style>
@@ -34,7 +34,7 @@ marker#arrow {
 <script>
 
 var width = 960,
-    height = 500;
+    height = 540;
 
 var force = d3.layout.force()
     .charge(-120)
@@ -44,6 +44,8 @@ var force = d3.layout.force()
 var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height);
+
+	
 
 d3.json("pathway.json", function(error, graph) {
 	force
@@ -81,4 +83,11 @@ d3.json("pathway.json", function(error, graph) {
 	});
 });
 
+// draw grey background
+svg.append("rect")
+    .attr("width", "100%")
+    .attr("height", "100%")
+    .attr("fill", "lightgrey");
+
+	
 </script>
