@@ -2,7 +2,10 @@
 #ifndef _PREDICATE_EVALUATOR_H
 #define _PREDICATE_EVALUATOR_H
 #define USE_INTERP_RESULT
-#include </usr/include/tcl.h>
+//use on ubuntu
+#include </usr/include/tcl/tcl.h>
+//use on cygwin
+//#include </usr/include/tcl.h>
 #ifndef _TCL
 #include <tcl/tcl.h>
 #endif
