@@ -14,7 +14,7 @@ install libxml2-dev
 install openssl
 
 Full Listing of libraries:
-sudo apt-get install git byacc bison tcl-dev flex check libreadline-dev libncurses5-devel libxml2 libxml2-dev openssl
+sudo apt-get install git byacc bison tcl-dev flex check libreadline-dev libncurses5-dev libxml2 libxml2-dev openssl
 
 Run:
 git clone https://github.com/g-jackson/cs4098
