@@ -53,61 +53,45 @@
 <li>
 <h3>Week 0</h3> Zero Velocity Release (<a href="http://fiquem.netsoc.ie/CS4098/KAWAII_RC1_rc0.tar.gz">tarball</a>)
 </li>
-</ul>
-
-<h1>
-<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements</h1>
-
-<ul>
-
+<li>
+<h3>Week 1</h3> Week1 Iteration (<a href="http://fiquem.netsoc.ie/CS4098/KAWAII_RC1_rc0.tar.gz">tarball</a>)
+</li>
 </ul>
 
 
-<p><b>Running the Program on Windows</b></p>
-<ul>
-<li>Download and Install Qt from: <a href="http://www.qt.io/download-open-source/">http://www.qt.io/download-open-source/</a>
-</li>
-<li>Run .pro file</li>
-</ul>
+<h1><a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements</h1>
+<h2 id="requirements-for-the-kernel">Requirements for the Kernel</h2>
+<p>To install program on a fresh Ubuntu 14.04 build the following dependancies must be met:</p>
+<pre><code>Libraries:
+install git
+install byacc
+install bison
+install tcl-dev
+install flex
+install check
+install libreadline-dev
+install libncurses5-dev
+install libxml2
+install libxml2-dev
+install openssl</code></pre>
+<p>Full Listing of libraries: sudo apt-get install git byacc bison tcl-dev flex check libreadline-dev libncurses5-dev libxml2 libxml2-dev openssl</p>
+
+<h1><a id="Running the Program" class="anchor" href="#Running" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running the Program</h1>
+<h2 id="running-the-kernel">Running the kernel</h2>
+<pre><code>git clone https://github.com/g-jackson/cs4098
+cd cs4098/peos/pml 
+make
+cd ../../..
+cd /cs4098/peos/os/kernel 
+make lib
+make peos</code></pre>
+<p>If you get an error related to the file y.tab.h. Locate the file y.tab.h in pml/pml folder Open it with a text editor that displays the line numbers (like Notepad++)<br /> At line 39 replace #if with #ifdef Save the file Retry the above make</p>
 
 
-<p><b>Running the Program on Linux</b></p>
+<h2 id="to-run-the-pathway-view-locally">To run the pathway view locally</h2>
+<p>With Firefox, simply opening pathview/index.html will work For Chrome, you'll need to add the flag --allow-file-access-from-files or alternatively you can set up a localhost to run the file from on windows this can be done by installing XAMPP on linux you'll need to add an entry in /etc/hosts and create an Apache vhost configuration I really recommend just using Chrome</p>
 
-<ul>
-<li>Download and Install Qt from: <a href="http://www.qt.io/download-open-source/">http://www.qt.io/download-open-source/</a>
-</li>
-<li>
-<p>Run the following:</p>
-<pre><code>
-sudo apt-get install synaptic
-sudo apt-get install qt4-dev-tools libqt4-dev libqt4-core libqt4-gui
-sudo -s chmod u+x QtSdk-offline-linux-x86_64-v1.2.1.run
-sudo -s ./QtSdk-offline-linux-x86_64-v1.2.1.run -style cleanlooks
-</code></pre>
-</li>
-<li>Install Qtsdk in /opt
-<code>
-sudo -s chmod -R 777 /opt/QtSDK 
-</code>
-</li>
-<li>Insall mysql
-<code>
-apt-get install mysql-server-5.6
-</code>
-</li>
-<li>Update
-<code>
-sudo apt-get update
-</code>
-</li>
-<li>Navigate to the src folder</li>
-<li>
-<code>qmake</code> to create the Makefile</li>
-<li>
-<code>make</code> to run the Makefile</li>
-<li>
-<code>./cs4098</code> to run the program</li>
-</ul>
+
 
       </section>
       <footer>

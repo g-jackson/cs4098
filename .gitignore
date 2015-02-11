@@ -219,3 +219,7 @@ pip-log.txt
 ## Project Specific
 ####################
 *.o
+*.exe
+stdout
+*.dat
+*.a
