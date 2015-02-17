@@ -12,9 +12,11 @@ install libncurses5-dev
 install libxml2
 install libxml2-dev
 install openssl
+install nodejs
+install npm
 
 Full Listing of libraries:
-sudo apt-get install git byacc bison tcl-dev flex check libreadline-dev libncurses5-dev libxml2 libxml2-dev openssl
+sudo apt-get install git byacc bison tcl-dev flex check libreadline-dev libncurses5-dev libxml2 libxml2-dev openssl nodejs npm
 
 Run:
 git clone https://github.com/g-jackson/cs4098
@@ -36,6 +38,7 @@ retry the above make
 
 make peos
 
+npm install moment pegjs should underscore underscore.string vows
 ====================================================================================================================
 
 To install program on Windows using Cygwin:
@@ -53,6 +56,8 @@ libxml2
 libxml2-dev 
 openssl
 pthread
+nodejs
+npm
 
 Download project from https://github.com/g-jackson/cs4098
 
@@ -72,3 +77,5 @@ retry the above make
 
 
 make peos
+
+npm install moment pegjs should underscore underscore.string vows
