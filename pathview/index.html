@@ -22,72 +22,115 @@ marker#arrow {
 <body>
 <script src="../javascripts/d3.min.js"></script>
 
-	<svg id="something_important_for_arrows_maybe" width="800" height="600">
+<div id="pathview"></div>
+
+	
+	<div id="selected_action" style="width:200px; height:200px; overflow:scroll; padding:5px; visibility:hidden" >
+		<div id="selected_action_name" style="font-weight:bold" ></div>
+		<div id="selected_action_state"></div>
+		<div id="selected_action_script"></div>
+	</div>
+	
+	<script>
+	var width = 960,
+		height = 540;
+		
+	var NODE_RADIUS = 8;
+	var SELECTED_NODE_RADIUS = 12;
+
+	var force = d3.layout.force()
+		.charge(-120)
+		.linkDistance(50)
+		.size([width, height]);
+
+	var svg = d3.select("body").append("svg")
+		.attr("width", width)
+		.attr("height", height);
+
+	var prev_click;
+	var STATE_COLOURS = ["red", "orange", "green"];
+
+	d3.json("pathway.json", function(error, graph) {
+		force
+			.nodes(graph.nodes)
+			.links(graph.links)
+			.start();
+		
+		var link = svg.selectAll(".link")
+			.data(graph.links)
+			.enter().append("line")
+			.attr("class", "link")
+			.attr("marker-end", "url(#arrow)");
+		  
+		var node = svg.selectAll(".node")
+			.data(graph.nodes)
+			.enter().append("circle")
+			.attr("class", "node")
+			.attr("r", NODE_RADIUS)
+			.style("fill", function(d) {return STATE_COLOURS[d.state];})
+			.on("click", function(d) {
+				if (typeof(prev_click) != "undefined") {
+					d3.select(prev_click).attr("r", NODE_RADIUS);
+				}
+				d3.select(this).attr("r", SELECTED_NODE_RADIUS);
+				
+				document.getElementById("selected_action").style.visibility = "visible";
+				//document.getElementById("selected_action_name").style.fontWeight = 'bold';
+				document.getElementById("selected_action_name").innerHTML = d.name;
+				
+				if (d.state == 0) { // blocked
+					document.getElementById("selected_action_state").innerHTML = "Blocked";
+					document.getElementById("selected_action_state").style.color = STATE_COLOURS[d.state];
+				} else if (d.state == 1) { // ready
+					document.getElementById("selected_action_state").innerHTML = "Ready";
+					document.getElementById("selected_action_state").style.color = STATE_COLOURS[d.state];
+				} else if (d.state == 2) { // complete
+					document.getElementById("selected_action_state").innerHTML = "Complete";
+					document.getElementById("selected_action_state").style.color = STATE_COLOURS[d.state];
+				}
+				
+				document.getElementById("selected_action_script").innerHTML = d.script;
+				prev_click = this;
+			})
+			.call(force.drag);
+		  
+		node.append("title")
+			.text(function(d) { return d.name; });
+
+		force.on("tick", function() {
+			link.attr("x1", function(d) { return d.source.x; })
+				.attr("y1", function(d) { return d.source.y; })
+				.attr("x2", function(d) { return d.target.x; })
+				.attr("y2", function(d) { return d.target.y; });
+				
+			node.attr("cx", function(d) { return d.x; })
+				.attr("cy", function(d) { return d.y; });
+		});
+	});
+
+	// draw grey background
+	svg.append("rect")
+		.attr("width", "100%")
+		.attr("height", "100%")
+		.attr("fill", "lightgrey")
+		.on("click", function() {
+			if (typeof(prev_click) != "undefined") {
+				d3.select(prev_click).attr("r", NODE_RADIUS);
+				prev_click = null;
+			}
+			document.getElementById("selected_action").style.visibility = "hidden";
+		});
+	
+	</script>
+
+	<svg id="something_important_for_arrows">
 		<defs>
-			<marker id="arrow" viewbox="0 -5 10 10" refX="18" refY="0"
-					markerWidth="6" markerHeight="6" orient="auto">
+			<marker id="arrow" viewbox="0 -5 10 10" refX="18" refY="0" markerWidth="6" markerHeight="6" orient="auto">
 				<path d="M0,-5L10,0L0,5Z">
 			</marker>
 	   </defs>
 	</svg>
-		
-<script>
-
-var width = 960,
-    height = 540;
-
-var force = d3.layout.force()
-    .charge(-120)
-    .linkDistance(50)
-    .size([width, height]);
-
-var svg = d3.select("body").append("svg")
-    .attr("width", width)
-    .attr("height", height);
-
 	
-
-d3.json("pathway.json", function(error, graph) {
-	force
-		.nodes(graph.nodes)
-		.links(graph.links)
-		.start();
-
-	var state_colours = ["red", "orange", "green"];
+<div>
 	
-	var link = svg.selectAll(".link")
-		.data(graph.links)
-		.enter().append("line")
-		.attr("class", "link")
-		.attr("marker-end", "url(#arrow)");
-	  
-	var node = svg.selectAll(".node")
-		.data(graph.nodes)
-		.enter().append("circle")
-		.attr("class", "node")
-		.attr("r", 8)
-		.style("fill", function(d) {return state_colours[d.state];})
-		.call(force.drag);
-	  
-	node.append("title")
-		.text(function(d) { return d.name; });
-
-	force.on("tick", function() {
-		link.attr("x1", function(d) { return d.source.x; })
-			.attr("y1", function(d) { return d.source.y; })
-			.attr("x2", function(d) { return d.target.x; })
-			.attr("y2", function(d) { return d.target.y; });
-			
-		node.attr("cx", function(d) { return d.x; })
-			.attr("cy", function(d) { return d.y; });
-	});
-});
-
-// draw grey background
-svg.append("rect")
-    .attr("width", "100%")
-    .attr("height", "100%")
-    .attr("fill", "lightgrey");
-
-	
-</script>
+</body>
