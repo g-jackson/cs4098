@@ -4,6 +4,8 @@
 *.o 
 *.tar
 *.txt
+*.xml
+*.a
 .depend
 BUGS
 PMLServer 
