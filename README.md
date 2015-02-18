@@ -26,23 +26,22 @@ Full Listing of libraries:
 ## Compiling the Kernel
 To Compile the kernel:
 
-* `make` must be run in `/peos/pml` and 
+* `make` must be run in `/peos/pml` 
+
+and 
 
 * `make lib` and `make peos` in `/peos/os/kernel`
 
-```
-cd cs4098/peos/pml 
+From root directory:
 
-make
+    cd peos/pml 
+    make
+    cd ../../..
+    cd /cs4098/peos/os/kernel 
+    make lib
+    make peos
 
-cd ../../..
 
-cd /cs4098/peos/os/kernel 
-
-make lib
-
-make peos
-```
 If you get an error related to the file y.tab.h. 
 
     1. Locate the file y.tab.h in pml/pml folder 
@@ -78,25 +77,24 @@ Libraries:
     imagemagick 
     php5-json 
 
-`sudo apt-get install apache2-mpm-prefork mysql-server libapache2-mod-php5 libdate-calc-perl libdbd-mysql-perl libdbi-perl libhtml-parser-perl libtiff-tools libwww-mechanize-perl libxml-parser-perl php5 php5-mysql php5-cli php5-gd php5-xsl php5-curl php5-mcrypt php-soap imagemagick php5-json `
+Full Listing of libraries:  `sudo apt-get install apache2-mpm-prefork mysql-server libapache2-mod-php5 libdate-calc-perl libdbd-mysql-perl libdbi-perl libhtml-parser-perl libtiff-tools libwww-mechanize-perl libxml-parser-perl php5 php5-mysql php5-cli php5-gd php5-xsl php5-curl php5-mcrypt php-soap imagemagick php5-json `
 
 ## To Install OpenEMR
 
 * Create a symlink from the /openemr folder to the root of the webserver
 ` ln -sd /openemr /var/www/html/ `
-
- **Note**: Permissions may have to be changed to allow modification
-
+* **Note**: Permissions may have to be changed to allow modification
 * Browse to http://localhost.com/openemr
-
-* Follow the instructions given
-    
+* Follow the instructions given 
 * For more info go to [Openemr Installation Instructions](http://www.open-emr.org/wiki/index.php/OpenEMR_4.2.0_Linux_Installation)
 
 ## To run the pathway view locally
-With Firefox, simply opening cs4098/pathview/index.html will work
-    For Chrome, you'll need to add the flag --allow-file-access-from-files
-        or alternatively you can set up a localhost to run the file from
-            on windows this can be done by installing XAMPP
-            on linux you'll need to add an entry in /etc/hosts and create an Apache vhost configuration
-    I really recommend just using Firefox
+Using Firefox is recommended for testing.
+
+* With Firefox, simply opening cs4098/pathview/index.html will work
+* For Chrome, you'll need to add the flag --allow-file-access-from-files
+* Alternatively you can set up a localhost to run the file from
+  - on windows this can be done by installing XAMPP
+  - on linux you'll need to add an entry in /etc/hosts and create an Apache vhost configuration
+  
+
