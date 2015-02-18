@@ -51,7 +51,7 @@ If you get an error related to the file y.tab.h.
     5. Retry the above make
 
 ## Requirements for OpenEMR
-To install openEMR on a fresh Ubuntu 14.04 build the following dependancies must be met from the  [Openemr Dependancy Page](from the openEMR Installation page (http://www.open-emr.org/wiki/index.php/OpenEMR_System_Architecture#OpenEMR_Dependencies):
+To install openEMR on a fresh Ubuntu 14.04 build the following dependancies must be met from the  [Openemr Dependancy Page](http://www.open-emr.org/wiki/index.php/OpenEMR_System_Architecture#OpenEMR_Dependencies):
 
 
 Libraries:
