@@ -1,5 +1,6 @@
 # cs4098
-Group Project ~Kawaii~
+##Group Project ~Kawaii~
+A project for CS4098 to demonstrate the use of the peos system with pml in a medical record system openEMR
 
 ## Requirements for the Kernel
 To install program on a fresh Ubuntu 14.04 build the following dependancies must be met:
