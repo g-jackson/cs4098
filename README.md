@@ -40,43 +40,14 @@ If you get an error related to the file y.tab.h.
 	Save the file 
 	Retry the above make
 
-====================================================================================================================
 
-To install program on Windows using Cygwin:
+## Requirements for Web Interface
+Create a symlink from project's /path folder to webserver's root directory 
+eg. ln -sd /path /var/www/html
 
-Add the following libraries in the cygwin setup.exe:
-```
-git 
-byacc 
-bison 
-tcl-dev 
-flex 
-check 
-libreadline-dev 
-libncurses5-dev
-libxml2 
-libxml2-dev 
-openssl
-pthread
-```
+Copy the compiled peos exectuable 
+cp /peos/kernel/os/peos /path
 
-Download project from https://github.com/g-jackson/cs4098
-
-```
-cd cs4098/peos/pml 
-make
-cd ../../..
-cd /cs4098/peos/os/kernel 
-make lib
-make peos
-```
-
-If you should get an error related to the file y.tab.h. 
-	Locate the file y.tab.h in pml/pml folder 
-	Open it with a text editor that displays the line numbers (like Notepad++) 	
-	At line 39 replace #if with #ifdef 
-	Save the file 
-	Retry the above make
 
 ## To run the pathway view locally
 With Firefox, simply opening pathview/index.html will work
