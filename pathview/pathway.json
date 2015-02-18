@@ -15,6 +15,9 @@
 	"resources":[
 		{"action_id":0, "resource_name":"resource_1"},
 		{"action_id":0, "resource_name":"resource_2"},
-		{"action_id":1, "resource_name":"resource_3"}
+		{"action_id":1, "resource_name":"resource_3"},
+		{"action_id":3, "resource_name":"resource_4"},
+		{"action_id":3, "resource_name":"resource_5"},
+		{"action_id":3, "resource_name":"resource_6"}
 	]
 }

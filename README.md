@@ -80,9 +80,9 @@ Libraries:
 	For more info go to (http://www.open-emr.org/wiki/index.php/OpenEMR_4.2.0_Linux_Installation)
 
 ## To run the pathway view locally
-With Firefox, simply opening pathview/index.html will work
-For Chrome, you'll need to add the flag --allow-file-access-from-files
-	or alternatively you can set up a localhost to run the file from
-		on windows this can be done by installing XAMPP
-		on linux you'll need to add an entry in /etc/hosts and create an Apache vhost configuration
-	I really recommend just using Chrome
+	With Firefox, simply opening cs4098/pathview/index.html will work
+	For Chrome, you'll need to add the flag --allow-file-access-from-files
+		or alternatively you can set up a localhost to run the file from
+			on windows this can be done by installing XAMPP
+			on linux you'll need to add an entry in /etc/hosts and create an Apache vhost configuration
+	I really recommend just using Firefox
