@@ -1,5 +1,5 @@
 event.log
 peos
 pelog
-proc_table.dat
-proc_table.dat.xml
+*.dat
+*.dat.xml
