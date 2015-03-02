@@ -575,6 +575,12 @@ if ($GLOBALS['patient_id_category_name']) {
 |
 <a href="stats_full.php?active=all" onclick='top.restoreSession()'>
 <?php echo htmlspecialchars(xl('Issues'),ENT_NOQUOTES); ?></a>
+|
+<?php                            # this is peos project code
+echo '<a href="/path/pid/' .     # opens this address new tab
+      $pid .                     # patient id is appended
+      '"target="_blank">';       # remove "target=_blank" for openemr integration
+echo htmlspecialchars(xl('Pathways'),ENT_NOQUOTES); ?></a> 
 
 <!-- DISPLAYING HOOKS STARTS HERE -->
 <?php
