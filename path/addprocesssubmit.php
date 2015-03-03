@@ -3,14 +3,17 @@
 
 <?php
 $file = @$_POST[pml];
-echo $file;
-
 //$arr = scandir("../");
 //for ($i = 0; $i < sizeof($arr); $i++)
 //	echo $arr[$i];
 
-$results = shell_exec('../peos/os/kernel/peos -c pml/'.$file.".pml");
-echo $results;
+exec('../peos/os/kernel/peos -c pml/'.$file.".pml 2>&1", $results);
+//exec('../peos/os/kernel/peos -i 2>&1', $results);
+//echo sizeof($results);
+for ($i = 0; $i < sizeof($results); $i++)
+	echo $results[$i];
+
+
 ?>
 
 </body>
