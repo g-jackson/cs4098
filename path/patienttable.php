@@ -44,7 +44,8 @@
     document.write("<table cellpadding=\"10\"><tr><th>\
       Process ID</th><th>\
       Model</th><th>\
-      status</th></tr>");
+      Status</th><th>\
+      Graph</th></tr>");
     var x = xmlDoc.getElementsByTagName("process");
     for (i = 0; i < x.length; i++)
       {
@@ -54,6 +55,10 @@
       document.write(x[i].getAttribute("model"));
       document.write("</td><td>");
       document.write(x[i].getAttribute("status"));
+      document.write("</td><td>");
+      var graphlink = "/graph.php?pid=" + pid + '&' + "procid=" + i;
+      graphlink = graphlink.replace(/\s/g, '');
+      document.write("<a href="+graphlink+">Pathway</a>");
       document.write("</td></tr>");
       }
     document.write("</table>");
