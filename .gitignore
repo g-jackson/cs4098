@@ -221,4 +221,4 @@ pip-log.txt
 *.exe
 stdout
 *.dat
-*.a
+peos/os/kernel/libpeos.a

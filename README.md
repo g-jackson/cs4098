@@ -88,6 +88,7 @@ Full Listing of libraries:  `sudo apt-get install apache2-mpm-prefork mysql-serv
 * Follow the instructions given 
 * For more info go to [Openemr Installation Instructions](http://www.open-emr.org/wiki/index.php/OpenEMR_4.2.0_Linux_Installation)
 
+
 ## To run the pathway view locally
 * Copy files from "javascripts" and "path" folders to webserver's root folder
 ` cp /javascripts /var/www/html/ -rf`
