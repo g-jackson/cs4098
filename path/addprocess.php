@@ -7,6 +7,15 @@ executes ./peos -c pml/"formpml"
 takes the output and finds the process id of the resulting process from it
 outputs that process id
 -->
+<script src="../javascripts/jquery.min.js"></script> 
+    <script> 
+    $(function(){
+      $("#navbar").load("navbar.html"); 
+    });
+    </script> 
+<div id="navbar"></div>
+<br>
+
 <?php
 
 $arr = scandir("pml");

@@ -1,4 +1,13 @@
 <!--this file should have a form for a pml doc that will be saved into the /pml folder in this directory-->
+<!--this script imports the navbar from navbar.html-->
+<script src="../javascripts/jquery.min.js"></script> 
+    <script> 
+    $(function(){
+      $("#navbar").load("navbar.html"); 
+    });
+    </script> 
+<div id="navbar"></div>
+<br>
 
 Form:
 -File Title
