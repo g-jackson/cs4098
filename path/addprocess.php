@@ -1,4 +1,4 @@
-This file should have a form containing the following
+<!--This file should have a form containing the following
 -patient id
 -dropdown of .pml files in /pml for selection
 
@@ -6,7 +6,7 @@ When submitted a php script that does the following should happen:
 executes ./peos -c pml/"formpml" 
 takes the output and finds the process id of the resulting process from it
 outputs that process id
-
+-->
 <?php
 
 $arr = scandir("pml");
@@ -16,12 +16,10 @@ for ($i = 0; $i < sizeof($arr); $i++) {
 	$split = explode(".", $arr[$i]);
 	if(sizeof($split) == 2 && $split[1] == "pml") $pml_opts[$j++] = $split[0];
 }
-
 ?>
 
 <html>
 <body>
-<br>
 <br>
 	<form action="addprocesssubmit.php" method="post">
 		Patient ID: <input name="ID" type="text"></input>

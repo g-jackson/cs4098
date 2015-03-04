@@ -13,7 +13,21 @@
     }
   </style>
 
-  <script>
+  <!-- get pid for passing to js -->
+  <div id="dom-target" style="display: none;">
+    <?php 
+        $pid = $_GET[pid];
+        echo htmlspecialchars($pid); 
+    ?>
+  </div>
+
+  <script> 
+    //get pid for js   
+    var div = document.getElementById("dom-target");
+    var pid = div.textContent;
+    var file = pid.concat(".dat.xml");
+    file = file.replace(/\s/g, '');
+    //document.write(file);
     if (window.XMLHttpRequest)
       {// code for IE7+, Firefox, Chrome, Opera, Safari
       xmlhttp = new XMLHttpRequest();
@@ -22,7 +36,8 @@
       {// code for IE6, IE5
       xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
       }
-    xmlhttp.open("GET","proc_table.dat.xml",false);
+
+    xmlhttp.open("GET", file ,false);
     xmlhttp.send();
     xmlDoc = xmlhttp.responseXML;
 
@@ -43,6 +58,5 @@
       }
     document.write("</table>");
   </script>
-
   </body>
 </html>
