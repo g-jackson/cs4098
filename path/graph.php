@@ -37,6 +37,15 @@ marker#arrow {
 
 </style>
 
+<script src="../javascripts/jquery.min.js"></script> 
+    <script> 
+    $(function(){
+      $("#navbar").load("navbar.html"); 
+    });
+    </script> 
+<div id="navbar"></div>
+<br>
+
 <body>
 
 
