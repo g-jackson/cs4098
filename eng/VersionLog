@@ -4,3 +4,4 @@ Date - Number - Addition
 11/02/2015 - v0.0.0 - Verion Log Created
 17/02/2015 - v0.1.0 - Removed gh-pages from main branch
 18/02/2015 - v0.2.0 - Added OpenEMR
+04/03/2015 - v0.3.0 - Integrate OpenEMR and Graphs and added PathViews 
