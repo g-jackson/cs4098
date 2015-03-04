@@ -81,14 +81,21 @@ Full Listing of libraries:  `sudo apt-get install apache2-mpm-prefork mysql-serv
 
 ## To Install OpenEMR
 
-* Create a symlink from the /openemr folder to the root of the webserver
-` ln -sd /openemr /var/www/html/ `
+* Copy files from openemr folder to your webserver's root folder
+` cp /openemr /var/www/html/ -rf`
 * **Note**: Permissions may have to be changed to allow modification
 * Browse to http://localhost.com/openemr
 * Follow the instructions given 
 * For more info go to [Openemr Installation Instructions](http://www.open-emr.org/wiki/index.php/OpenEMR_4.2.0_Linux_Installation)
 
 ## To run the pathway view locally
+* Copy files from "javascripts" and "path" folders to webserver's root folder
+` cp /javascripts /var/www/html/ -rf`
+` cp /path /var/www/html/ -rf`
+* Opening localhost/path/ will display a listing of all the pathways present
+* From here you can add and view pathways
+ 
+## Testing peos graphing
 Using Firefox is recommended for testing.
 
 * With Firefox, simply opening cs4098/pathview/index.html will work
@@ -96,5 +103,3 @@ Using Firefox is recommended for testing.
 * Alternatively you can set up a localhost to run the file from
   - on windows this can be done by installing XAMPP
   - on linux you'll need to add an entry in /etc/hosts and create an Apache vhost configuration
-  
-
