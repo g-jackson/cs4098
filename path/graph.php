@@ -38,6 +38,9 @@ marker#arrow {
 </style>
 
 <body>
+
+
+
 <script src="../javascripts/d3.min.js"></script>
 <script src="../javascripts/xml2json.min.js"></script>
 
@@ -52,10 +55,28 @@ marker#arrow {
 		Script:
 		<div id="selected_action_script"></div>
 	</div>
-	
+
+	<!-- get pid for passing to js -->
+	<div id="dom-target" style="display: none;">
+	<?php 
+		$pid = $_GET[pid];
+		$procid = $_GET[procid];
+		echo htmlspecialchars($pid . " " . $procid);
+	?>
+	</div>
+
 	<script>
+	var div = document.getElementById("dom-target");
+	var data = div.textContent;
+	var data = data.match(/\S+/g);
+	file = (data[0]+".dat.xml");
+	file = file.replace(/\s/g, '');
+	proc = data[1];
+	document.write("<br>pid = " + data[0]);
+	document.write("<br>process = " + proc);
+
 	var x2js = new X2JS();
-	var proc_table_loc = '1.dat.xml';
+	var proc_table_loc = 'proc_table.dat.xml';
 	var proc_table;
 
 	var width = 960,
@@ -230,7 +251,7 @@ marker#arrow {
 		xmlhttp.send();
 	}
 
-	load_path_data(2);
+	load_path_data(proc);
 
 	var force = d3.layout.force()
 		.charge(-120)

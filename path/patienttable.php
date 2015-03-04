@@ -36,7 +36,7 @@
     var pid = div.textContent;
     var file = pid.concat(".dat.xml");
     file = file.replace(/\s/g, '');
-    //document.write(file);
+    document.write("Patient ID ="+ pid);
     if (window.XMLHttpRequest)
       {// code for IE7+, Firefox, Chrome, Opera, Safari
       xmlhttp = new XMLHttpRequest();
@@ -65,7 +65,7 @@
       document.write("</td><td>");
       document.write(x[i].getAttribute("status"));
       document.write("</td><td>");
-      var graphlink = "/graph.php?pid=" + pid + '&' + "procid=" + i;
+      var graphlink = "graph.php?pid=" + pid + '&' + "procid=" + i;
       graphlink = graphlink.replace(/\s/g, '');
       document.write("<a href="+graphlink+">Pathway</a>");
       document.write("</td></tr>");

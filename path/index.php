@@ -57,6 +57,7 @@
 
     for (i =0; i< files.length;i++){
       file = files[i];
+      pid = file.match(/\d/);
       //document.write(file + "<br>");
       
       if (window.XMLHttpRequest){
@@ -73,7 +74,7 @@
       var x = xmlDoc.getElementsByTagName("process");
       for (j = 0; j < x.length; j++){
         document.write("<tr><td>");
-        document.write(i);
+        document.write(pid);
         document.write("</td><td>");
         document.write(x[j].getAttribute("pid"));
         document.write("</td><td>");
@@ -81,7 +82,7 @@
         document.write("</td><td>");
         document.write(x[j].getAttribute("status"));
         document.write("</td><td>");
-        var graphlink = "/graph.php?pid=" + pid + '&' + "procid=" + j;
+        var graphlink = "graph.php?pid=" + pid + '&' + "procid=" + j;
         graphlink = graphlink.replace(/\s/g, '');
         document.write("<a href="+graphlink+">Pathway</a>");
         document.write("</td></tr>");
