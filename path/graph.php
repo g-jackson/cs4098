@@ -85,7 +85,7 @@ marker#arrow {
 	document.write("<br>process = " + proc);
 
 	var x2js = new X2JS();
-	var proc_table_loc = 'proc_table.dat.xml';
+	var proc_table_loc = file;
 	var proc_table;
 
 	var width = 960,
