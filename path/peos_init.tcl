@@ -73,6 +73,7 @@ proc misspellcount { path } {
     expr $i
 }
 
+#returns 0 if no pnotes or patientid is null
 proc mysqlquery { patientid } {
     set res 0;
     set mysql_handler [mysqlconnect -user "root" -password "password" -db "openemr"]

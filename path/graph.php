@@ -48,8 +48,6 @@ marker#arrow {
 
 <body>
 
-
-
 <script src="../javascripts/d3.min.js"></script>
 <script src="../javascripts/xml2json.min.js"></script>
 
@@ -82,6 +80,7 @@ marker#arrow {
 	file = file.replace(/\s/g, '');
 	proc = data[1];
 	document.write("<br>pid = " + data[0]);
+	document.write("<br>file = " + file);
 	document.write("<br>process = " + proc);
 
 	var x2js = new X2JS();
