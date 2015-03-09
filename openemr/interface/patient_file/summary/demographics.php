@@ -575,7 +575,12 @@ if ($GLOBALS['patient_id_category_name']) {
 |
 <a href="stats_full.php?active=all" onclick='top.restoreSession()'>
 <?php echo htmlspecialchars(xl('Issues'),ENT_NOQUOTES); ?></a>
-
+|
+<?php                            # this is cs4098 peos project code
+echo '<a href="/path/patienttable.php?pid=' .     # opens this address new tab
+      $pid .                     # patient id is appended
+      '"target="_blank">';       # remove "target=_blank" for openemr integration
+echo htmlspecialchars(xl('Pathways'),ENT_NOQUOTES); ?></a> 
 <!-- DISPLAYING HOOKS STARTS HERE -->
 <?php
 	$module_query = sqlStatement("SELECT msh.*,ms.menu_name,ms.path,m.mod_ui_name,m.type FROM modules_hooks_settings AS msh
