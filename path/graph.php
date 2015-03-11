@@ -51,7 +51,27 @@ marker#arrow {
 <script src="../javascripts/d3.min.js"></script>
 <script src="../javascripts/xml2json.min.js"></script>
 
-<h1><b>Pathview</b></h1>
+
+<!-- get pid for passing to js -->
+<div id="dom-target" style="display: none;">
+<?php 
+	$pid = $_GET['pid'];
+	$procid = $_GET['procid'];
+	echo htmlspecialchars($pid . " " . $procid);
+?>
+</div>
+
+<script>
+	var div = document.getElementById("dom-target");
+	var data = div.textContent;
+	var data = data.match(/\S+/g);
+	file = (data[0]+".dat.xml");
+	file = file.replace(/\s/g, '');
+	proc = data[1];
+	document.write("<br>pid = " + data[0]);
+	document.write("<br>file = " + file);
+	document.write("<br>process = " + proc);
+</script>
 
 <div id="pathview">
 
@@ -63,26 +83,9 @@ marker#arrow {
 		<div id="selected_action_script"></div>
 	</div>
 
-	<!-- get pid for passing to js -->
-	<div id="dom-target" style="display: none;">
-	<?php 
-		$pid = $_GET[pid];
-		$procid = $_GET[procid];
-		echo htmlspecialchars($pid . " " . $procid);
-	?>
-	</div>
+
 
 	<script>
-	var div = document.getElementById("dom-target");
-	var data = div.textContent;
-	var data = data.match(/\S+/g);
-	file = (data[0]+".dat.xml");
-	file = file.replace(/\s/g, '');
-	proc = data[1];
-	document.write("<br>pid = " + data[0]);
-	document.write("<br>file = " + file);
-	document.write("<br>process = " + proc);
-
 	var x2js = new X2JS();
 	var proc_table_loc = file;
 	var proc_table;
@@ -97,11 +100,6 @@ marker#arrow {
 	var prev_click;
 
 	var links = [];
-//	var links = {"links":[
-//		{"source":0, "target":3},
-//		{"source":1, "target":3}
-//	]};
-//	links.links.push({"source":"2", "target":"3"});
 
 	function get_state_colour(d) {
 		if (d._state == "BLOCKED") {
@@ -117,6 +115,73 @@ marker#arrow {
 		}
 	}
 
+	function creatLinkForReqResource(process_data, req_resource_name, req_resource_action_index) {
+		
+
+		// for each action
+		for (var act_j = 0; act_j < process_data.action.length; act_j++) {
+
+			// search through required provided resources
+			if (process_data.action[act_j].prov_resource == null) { // no provided resources
+				// nothing to link
+			} else if (process_data.action[act_j].prov_resource.length >= 2) { // list of resources
+
+				// and link them to actions providing that resource
+				for (var res_i = 0; res_i < process_data.action[act_j].prov_resource.length; res_i++) {
+					var resource_name = process_data.action[act_j].prov_resource[res_i]._name;
+					if (req_resource_name === resource_name) {
+						var link = {};
+						link.source = act_j;
+						link.target = req_resource_action_index;
+						links.push(link);
+					}
+				}
+
+			} else { // only one resource
+				var resource_name = process_data.action[act_j].prov_resource._name;
+				if (req_resource_name === resource_name) {
+					var link = {};
+					link.source = act_j;
+					link.target = req_resource_action_index;
+					links.push(link);
+				}
+			}
+			
+		}
+	}
+
+	function generateLinks(process_data) {
+		// nothing to link if only one action or less
+		if (process_data.action === null) {
+			return;
+		} 
+
+		if (process_data.action.length >= 2) {
+			
+			// for each action
+			for (var act_i = 0; act_i < process_data.action.length; act_i++) {
+
+				// search through required required resources
+				if (process_data.action[act_i].req_resource == null) { // no required resources
+					// nothing to link
+				} else if (process_data.action[act_i].req_resource.length >= 2) { // list of resources
+
+					// and link them to actions providing that resource
+					for (var res_i = 0; res_i < process_data.action[act_i].req_resource.length; res_i++) {
+						var resource_name = process_data.action[act_i].req_resource[res_i]._name;
+						creatLinkForReqResource(process_data, resource_name, act_i);
+					}
+
+				} else { // only one resource
+					var resource_name = process_data.action[act_i].req_resource._name;
+					creatLinkForReqResource(process_data, resource_name, act_i);
+				}
+				
+			}
+
+		}
+	}
+
 	function load_path_data(id) {
 		var xmlhttp;
 		var txt,x,xx,i;
@@ -129,9 +194,17 @@ marker#arrow {
 			if (xmlhttp.readyState==4 && xmlhttp.status==200){
 
 				var xml_string = new XMLSerializer().serializeToString(xmlhttp.responseXML.documentElement);
-				proc_table = x2js.xml_str2json(xml_string);
+				var proc_table = x2js.xml_str2json(xml_string);
 
-				process_data = proc_table.process_table.process[id];
+				var process_data;
+				if (proc_table.process_table.process.length >= 2) {
+					process_data = proc_table.process_table.process[id];
+				} else {
+					process_data = proc_table.process_table.process;
+				}
+				
+				generateLinks(process_data);
+				//alert(JSON.stringify(links));
 
 				force
 					.nodes(process_data.action)
@@ -166,22 +239,8 @@ marker#arrow {
 						document.getElementById("selected_action_name").innerHTML = d._name;
 			
 						// display state with colour
-						if (d._state == "BLOCKED") {
-							document.getElementById("selected_action_state").innerHTML = "Blocked";
-							document.getElementById("selected_action_state").style.color = "red";
-						} else if (d._state == "AVAILABLE") {
-							document.getElementById("selected_action_state").innerHTML = "Available";
-							document.getElementById("selected_action_state").style.color = "orange";
-						} else if (d._state == "READY") {
-							document.getElementById("selected_action_state").innerHTML = "Ready";
-							document.getElementById("selected_action_state").style.color = "yellow";
-						} else if (d._state == "COMPLETE") {
-							document.getElementById("selected_action_state").innerHTML = "Complete";
-							document.getElementById("selected_action_state").style.color = "green";
-						} else {
-							document.getElementById("selected_action_state").innerHTML = "Undefined";
-							document.getElementById("selected_action_state").style.color = "grey";
-						}
+						document.getElementById("selected_action_state").innerHTML = d._state;
+						document.getElementById("selected_action_state").style.color = get_state_colour(d);
 			
 						// display script
 						document.getElementById("selected_action_script").innerHTML = d.script;
