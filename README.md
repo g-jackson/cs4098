@@ -4,7 +4,7 @@ A project for CS4098 to demonstrate the use of the peos system with pml in a med
 
 ## Project Intallation
 
-### To install the project the following steps must be taken. Further detail on each step is below.
+To install the project the following steps must be taken. Further detail on each step is below.
 * Downlading this repository 
 * Downloading and making the peos kernel from the jnoll/peos repository
 * Installing OpenEMR provided in this repository (Version 4.2.0 with modifications in order to add pathway support)
@@ -46,22 +46,23 @@ Full Listing of libraries on Ubuntu(14.04):  `sudo apt-get install apache2-mpm-p
 ## OpenEMR Installation
 
 * Copy files from openemr folder to your webserver's root folder
-` cp /openemr /var/www/html/ -rf`
+* ` cp /openemr /var/www/html/ -rf`
 * This folder will have to have read/write/execute capabilities by the webserver so chown-ing the openemr folder to the webserver will be nessecary (The required commands will be webserver and platform dependant):
-` chown www-data /openemr`
+* ` chown www-data /openemr`
 * Browse to http://localhost.com/openemr
 * Follow the instructions given 
 * For more info go to [Openemr Installation Instructions](http://www.open-emr.org/wiki/index.php/OpenEMR_4.2.0_Linux_Installation)
 
 ## Testing Subsystems
+If you are interested in using only some of the subsystems in this project without the installation of openemr
 
 ### Running the pathway view locally without openemr
 * Download and compile the peos kernel from github.com/jnoll/peos
 * Copy files from "javascripts" and "path" folders to webserver's root folder
-` cp /javascripts /var/www/html/ -rf`
-` cp /path /var/www/html/ -rf`
+* ` cp /javascripts /var/www/html/ -rf`
+* ` cp /path /var/www/html/ -rf`
 * Provide permissions for the webserver to r/w/x the files in the folders
-`chown www-data /openemr/javascripts`
-`chown www-data /openemr/path`
+* `chown www-data /openemr/javascripts`
+* `chown www-data /openemr/path`
 * Opening localhost/openemr/pathway/ will display a listing of all the pathways present
 * From here you can add and view pathways
