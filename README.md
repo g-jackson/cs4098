@@ -2,57 +2,19 @@
 ##Group Project ~Kawaii~
 A project for CS4098 to demonstrate the use of the peos system with pml in a medical record system openEMR
 
-## Requirements for the Kernel
-To install program on a fresh Ubuntu 14.04 build the following dependancies must be met:
+## Project Requirements
 
-Libraries:
+### To install the project the following steps must be taken. Further detail on each step is below.
+* Downloading and making the peos kernel from the jnoll/peos repository
+* Installing OpenEMR provided in this repository (Version 4.2.0 with modifications in order to add pathway support)
 
-    git
-    byacc
-    bison
-    tcl-dev
-    flex
-    check
-    libreadline-dev
-    libncurses5-dev
-    libxml2
-    libxml2-dev
-    openssl
-
-
-Full Listing of libraries:
-`sudo apt-get install git byacc bison tcl-dev flex check libreadline-dev libncurses5-dev libxml2 libxml2-dev openssl`
-
-## Compiling the Kernel
-To Compile the kernel:
-
-* `make` must be run in `/peos/pml` 
-
-and 
-
-* `make lib` and `make peos` in `/peos/os/kernel`
-
-From root directory:
-
-    cd peos/pml 
-    make
-    cd ../../..
-    cd /cs4098/peos/os/kernel 
-    make lib
-    make peos
-
-
-If you get an error related to the file y.tab.h. 
-
-    1. Locate the file y.tab.h in pml/pml folder 
-    2. Open it with a text editor that displays the line numbers (like Notepad++)   
-    3. At line 39 replace #if with #ifdef 
-    4. Save the file 
-    5. Retry the above make
+## Requirements for the PEOS Kernel
+* Clone the repository at github.com/jnoll/peos
+* Run make from the root of the project
+* Copy the compiled peos executable into openemr/pathway/
 
 ## Requirements for OpenEMR
-To install openEMR on a fresh Ubuntu 14.04 build the following dependancies must be met from the  [Openemr Dependancy Page](http://www.open-emr.org/wiki/index.php/OpenEMR_System_Architecture#OpenEMR_Dependencies):
-
+To install openEMR on an Ubunutu 14.04 build the following dependancies must be met from the  [Openemr Dependancy Page](http://www.open-emr.org/wiki/index.php/OpenEMR_System_Architecture#OpenEMR_Dependencies):
 
 Libraries:
 
@@ -83,24 +45,21 @@ Full Listing of libraries:  `sudo apt-get install apache2-mpm-prefork mysql-serv
 
 * Copy files from openemr folder to your webserver's root folder
 ` cp /openemr /var/www/html/ -rf`
-* **Note**: Permissions may have to be changed to allow modification
+* This folder will have to have read/write/execute capabilities by the webserver so chown-ing the openemr folder to the webserver will likely be nessecary:
+` chown www-data /openemr`
 * Browse to http://localhost.com/openemr
 * Follow the instructions given 
-* For more info go to [Openemr Installation Instructions](http://www.open-emr.org/wiki/index.php/OpenEMR_4.2.0_Linux_Installation)
+* For more info or if problems arrise go to [Openemr Installation Instructions](http://www.open-emr.org/wiki/index.php/OpenEMR_4.2.0_Linux_Installation)
 
+## Testing Subsystems
 
-## To run the pathway view locally
+### To run the pathway view locally without openemr
+* Download and compile the peos kernel from github.com/jnoll/peos
 * Copy files from "javascripts" and "path" folders to webserver's root folder
 ` cp /javascripts /var/www/html/ -rf`
 ` cp /path /var/www/html/ -rf`
-* Opening localhost/path/ will display a listing of all the pathways present
+* Provide permissions for the webserver to r/w/x the files in the folders
+`chown www-data /openemr/javascripts`
+`chown www-data /openemr/path`
+* Opening localhost/openemr/pathway/ will display a listing of all the pathways present
 * From here you can add and view pathways
- 
-## Testing peos graphing
-Using Firefox is recommended for testing.
-
-* With Firefox, simply opening cs4098/pathview/index.html will work
-* For Chrome, you'll need to add the flag --allow-file-access-from-files
-* Alternatively you can set up a localhost to run the file from
-  - on windows this can be done by installing XAMPP
-  - on linux you'll need to add an entry in /etc/hosts and create an Apache vhost configuration

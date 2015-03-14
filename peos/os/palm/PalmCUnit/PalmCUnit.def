@@ -1,4 +1,0 @@
-application { "PalmCUnit" UntT } 
-multiple code {
- framewrk "init" "krnl"
-}

@@ -1,3 +1,0 @@
-SEARCHDIR=/users/student/msaeed
-MAILBOX=/var/spool/mail/msaeed
-
