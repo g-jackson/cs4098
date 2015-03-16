@@ -10,7 +10,7 @@
 <html>
 <body>
 <br>
-	<form action="patienttable.php" method="get">
+	<form action="../index.php" method="get">
 		Patient ID: <input name="pid" type="text"></input>
 		<input type="submit">
 	</form>
