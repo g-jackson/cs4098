@@ -1,11 +1,19 @@
-<script src="../javascripts/jquery.min.js"></script> 
-    <script> 
-    $(function(){
-      $("#navbar").load("navbar.html"); 
-    });
-    </script> 
-<div id="navbar"></div>
-<br>
+<style>
+li {
+    display: inline;
+}
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+</style>
+<ul>
+  <li><a href="pathway/patient_table.php">Home</a> |</li>
+  <li><a href="pathway/addpath.php">Add .pml</a> |</li>
+  <li><a href="pathway/addprocess.php">Add Pathway</a> |</li>
+  <li><a href="pathway/search.php">Search For Patient</a></li>
+</ul>
 
 <html>
   <head>
@@ -34,8 +42,10 @@
     //get pid for js   
     var div = document.getElementById("dom-target");
     var pid = div.textContent;
-    var file = pid.concat(".dat.xml");
+    var file = "pathway/";
+    file = file.concat(pid.concat(".dat.xml"));
     file = file.replace(/\s/g, '');
+    //document.write("Path ="+ file);
     document.write("Patient ID ="+ pid);
     if (window.XMLHttpRequest)
       {// code for IE7+, Firefox, Chrome, Opera, Safari
@@ -67,7 +77,7 @@
       document.write("</td><td>");
       var graphlink = "graph.php?pid=" + pid + '&' + "procid=" + i;
       graphlink = graphlink.replace(/\s/g, '');
-      document.write("<a href="+graphlink+">Pathway</a>");
+      document.write("<a href=pathway/"+graphlink+">Pathway</a>");
       document.write("</td></tr>");
       }
     document.write("</table>");
