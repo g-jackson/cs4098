@@ -58,11 +58,12 @@ If you are interested in using only some of the subsystems in this project witho
 
 ### Running the pathway view locally without openemr
 * Download and compile the peos kernel from github.com/jnoll/peos
+* Copy the compiled peos executable from peos/os/kernel into openemr/pathway/pathway
 * Copy files from "javascripts" and "path" folders to webserver's root folder
-* ` cp /javascripts /var/www/html/ -rf`
-* ` cp /path /var/www/html/ -rf`
+* ` cp openemr/pathway/javascripts /var/www/html/ -rf`
+* ` cp openemr/pathway/pathway /var/www/html/ -rf`
 * Provide permissions for the webserver to r/w/x the files in the folders
-* `chown www-data /openemr/javascripts`
-* `chown www-data /openemr/path`
-* Opening localhost/openemr/pathway/ will display a listing of all the pathways present
+* `chown www-data javascripts`
+* `chown www-data pathway`
+* Opening http://localhost/pathway/patient_table.php will display a listing of all the pathways present
 * From here you can add and view pathways
