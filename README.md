@@ -10,9 +10,9 @@ To install the project the following steps must be taken. Further detail on each
 * Installing OpenEMR provided in this repository (Version 4.2.0 with modifications in order to add pathway support)
 
 ## Requirements for the PEOS Kernel
-* Clone the repository at github.com/jnoll/peos
+* Clone the repository at http://github.com/jnoll/peos
 * Run make from the root of the project
-* Copy the compiled peos executable from peos/os/kernel into openemr/pathway/
+* Copy the compiled peos executable from peos/os/kernel into openemr/pathway/pathway
 * This compiled executable is the only part of the peos repository that this project requires. 
 
 ## Requirements for OpenEMR
