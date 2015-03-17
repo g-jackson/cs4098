@@ -7,7 +7,7 @@ process sample5 {
   action act_1 {
     script {"test script"}
     requires{t}
-    provides{t.mysqlquery}
+    provides{y}
   }
  }
 

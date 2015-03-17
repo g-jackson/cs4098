@@ -74,21 +74,21 @@ proc misspellcount { path } {
 }
 
 #returns 0 if no pnotes or patientid is null 1 if pnotes
-proc mysqlquery { patientid } {
-    set res 0;
-    #puts $query
-    if { [regexp {^([0-9]+)$} $patientid] } {
-        set mysql_handler [mysqlconnect -user "root" -password "password" -db "openemr"]      
-        set query {select body from pnotes where pid = }
-        lappend query $patientid
-        set hl7 [mysqlsel $mysql_handler $query -flatlist] 
-        mysqlclose $mysql_handler
-        #puts $hl7
-        if {$hl7 != {} } {
-            set res 1
-        }
-    }
-    #puts $res
-    return $res
-}
-mysqlquery ""
+#proc mysqlquery { patientid } {
+#    set res 0;
+#    #puts $query
+#    if { [regexp {^([0-9]+)$} $patientid] } {
+#        set mysql_handler [mysqlconnect -user "root" -password "password" -db "openemr"]      
+#        set query {select body from pnotes where pid = }
+#        lappend query $patientid
+#        set hl7 [mysqlsel $mysql_handler $query -flatlist] 
+#        mysqlclose $mysql_handler
+#        #puts $hl7
+#        if {$hl7 != {} } {
+#            set res 1
+#        }
+#    }
+#    #puts $res
+#    return $res
+#}
+#mysqlquery ""
