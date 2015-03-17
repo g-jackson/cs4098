@@ -1,5 +1,6 @@
 process sample5 {
   action act_0 {
+  	requires{t}
     script {"test script"}
     provides{t}
   }
