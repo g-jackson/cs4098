@@ -1,0 +1,30 @@
+body
+{
+  background-color: #FEFDCF;
+  margin: 8px;
+  font-family: sans-serif;
+  font-size: 1em;
+}
+table
+{
+  clear: both;
+  width: 100%;
+}
+th
+{
+  padding: 3px 18px 3px 10px;
+  border-bottom: 1px solid #000;
+  font-weight: bold;
+}
+tr.odd
+{
+  background-color: #E2E4FF;
+}
+tr.even
+{
+  background-color: #FFF;
+}
+td
+{
+  padding: 3px 10px;
+}
