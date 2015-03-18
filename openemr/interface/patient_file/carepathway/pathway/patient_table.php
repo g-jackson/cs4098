@@ -14,14 +14,6 @@
   </head>
   <body>
 
-  <style>
-    table, tr, td
-    {
-      border: 1px solid black;
-        border-collapse: collapse;
-    }
-  </style>
-
   <!--get all xml files -->
   <?php
   $pid;
@@ -41,6 +33,7 @@
     var pid = div.textContent;
 
     var files = pid.match(/\S+/g);
+    var row_count = 0;
     /*
     for (i=0;i<files.length;i++){
       document.write(files[i]+"<br>");
@@ -48,7 +41,7 @@
     */
     document.write("patients = " +files.length+ "<br>");
 
-    document.write("<table cellpadding=\"10\"><tr><th>\
+    document.write("<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"><tr><th>\
         Patient ID</th><th>\
         Process ID</th><th>\
         Model</th><th>\
@@ -70,10 +63,13 @@
       xmlhttp.open("GET", file ,false);
       xmlhttp.send();
       xmlDoc = xmlhttp.responseXML;
-      
+
       var x = xmlDoc.getElementsByTagName("process");
       for (j = 0; j < x.length; j++){
-        document.write("<tr><td>");
+        //document.write("<tr><td>");
+        if (row_count%2 == 0) document.write("<tr class=\"odd\"><td>");
+        else if (row_count%2 == 1) document.write("<tr class=\"even\"><td>");
+        row_count++;
         document.write(pid);
         document.write("</td><td>");
         document.write(x[j].getAttribute("pid"));

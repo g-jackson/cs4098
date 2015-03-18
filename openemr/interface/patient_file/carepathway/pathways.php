@@ -18,16 +18,16 @@ ul {
 <html>
   <head>
     <title>Pathview</title>
-    <link rel="stylesheet" type="text/css" href="main.css">
+    <link rel="stylesheet" type="text/css" href="pathway/main.css">
   </head>
   <body>
 
   <style>
-    table, tr, td
+    /*table, tr, td
     {
       border: 1px solid black;
         border-collapse: collapse;
-    }
+    }*/
   </style>
 
   <!-- get pid for passing to js -->
@@ -60,15 +60,19 @@ ul {
     xmlhttp.send();
     xmlDoc = xmlhttp.responseXML;
 
-    document.write("<table cellpadding=\"10\"><tr><th>\
+    document.write("<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"><tr><th>\
       Process ID</th><th>\
       Model</th><th>\
       Status</th><th>\
       Graph</th></tr>");
     var x = xmlDoc.getElementsByTagName("process");
+    var row_count = 0;
     for (i = 0; i < x.length; i++)
       {
-      document.write("<tr><td>");
+      //document.write("<tr><td>");
+      if (row_count%2 == 0) document.write("<tr class=\"odd\"><td>");
+      else if (row_count%2 == 1) document.write("<tr class=\"even\"><td>");
+      row_count++;
       document.write(x[i].getAttribute("pid"));
       document.write("</td><td>");
       document.write(x[i].getAttribute("model"));

@@ -28,6 +28,9 @@ for ($i = 0; $i < sizeof($arr); $i++) {
 ?>
 
 <html>
+<head>
+        <link rel="stylesheet" type="text/css" href="main.css">
+</head>
 <body>
 <br>
 	<form action="addprocesssubmit.php" method="post">
