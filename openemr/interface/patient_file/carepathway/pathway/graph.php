@@ -46,6 +46,10 @@ marker#arrow {
 <div id="navbar"></div>
 <br>
 
+<head>
+        <link rel="stylesheet" type="text/css" href="main.css">
+</head>
+
 <body>
 
 <script src="../javascripts/d3.min.js"></script>
