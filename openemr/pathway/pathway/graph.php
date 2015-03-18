@@ -208,7 +208,7 @@ marker#arrow {
 		}
 	}
 
-	var node_count;
+
 
 	function load_path_data(id) {
 		var xmlhttp;
@@ -229,14 +229,29 @@ marker#arrow {
 				} else {
 					process_data = proc_table.process_table.process;
 				}
-				
-				node_count = process_data.action.length;
-				// alert('node_count: ' + node_count);
 
 				generateLinks(process_data);
 				// alert(JSON.stringify(links));
 
+				if ( process_data.action.length >= 2 ) {
+					var length = process_data.action.length;
+
+					// give first node a fixed position
+					process_data.action[0].x = 100;
+					process_data.action[0].y = height/2;
+					process_data.action[0].fixed = true;
+
+					// give last node a fixed position
+					process_data.action[length-1].x = width-100;
+					process_data.action[length-1].y = height/2;
+					process_data.action[length-1].fixed = true;
+				}
+
 				force
+					.gravity(0)
+					.charge(15)
+					.linkStrength(0.1)
+					.chargeDistance(5)
 					.nodes(process_data.action)
 					.links(links)
 					.start();
@@ -346,34 +361,13 @@ marker#arrow {
 				
 
 				force.on("tick", function() {
-
-
-					node.attr("cx", function(d) {
-							if (d.index === 0) {
-								d.x = 0+100;
-								return d.x;
-							} else if (d.index === node_count - 1) {
-								d.x = width-100;
-								return d.x;
-							} else {
-								return d.x;
-							}
-						})
-						.attr("cy", function(d) { 
-							if (d.index === 0) {
-								d.y = height/2;
-								return d.y;
-							} else if (d.index === node_count - 1) {
-								d.y = height/2;
-								return d.y;
-							} else {
-								return d.y;
-							} 
-						});
 					link.attr("x1", function(d) { return d.source.x; })
 						.attr("y1", function(d) { return d.source.y; })
 						.attr("x2", function(d) { return d.target.x; })
 						.attr("y2", function(d) { return d.target.y; });
+
+					node.attr("cx", function(d) { return d.x; })
+						.attr("cy", function(d) { return d.y; });
 				});
 
 			}
@@ -386,14 +380,15 @@ marker#arrow {
 	
 
 	var force = d3.layout.force()
-		.gravity(0)
-		.charge(0)
-		.linkStrength(0)
+		
 		.size([width, height]);
 
 	var svg = d3.select("#pathview").append("svg")
 		.attr("width", width)
 		.attr("height", height);
+
+	var drag = force.drag()
+		.on("dragstart", dragstart); 
 
 	// draw grey background
 	svg.append("rect")
@@ -418,6 +413,11 @@ marker#arrow {
 			}
 			document.getElementById("selected_action").style.visibility = "hidden";
 		});
+
+	function dragstart(d) {
+		d3.select(this).classed("fixed", d.fixed = true);
+	} 
+	
 	</script>
 
 	<svg id="something_important_for_arrows">
