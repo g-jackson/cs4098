@@ -46,7 +46,7 @@ Full Listing of libraries on Ubuntu(14.04):  `sudo apt-get install apache2-mpm-p
 ## OpenEMR Installation
 
 * Copy files from openemr folder to your webserver's root folder
-* ` cp openemr /var/www/html/ -rf`
+* ` cp <repo-directory>/openemr /var/www/html/ -rf`
 * This folder will have to have read/write/execute capabilities by the webserver so chown-ing the openemr folder to the webserver will be nessecary (The required commands will be webserver and platform dependant):
 * ` chown www-data openemr`
 * Browse to http://localhost.com/openemr
