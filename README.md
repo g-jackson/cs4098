@@ -12,7 +12,7 @@ To install the project the following steps must be taken. Further detail on each
 ## Requirements for the PEOS Kernel
 * Clone the repository at http://github.com/jnoll/peos
 * Run make from the root of the project
-* Copy the compiled peos executable from peos/os/kernel into openemr/pathway/pathway
+* Copy the compiled peos executable from peos/os/kernel into openemr/interface/patient_file/carepathways/pathway
 * This compiled executable is the only part of the peos repository that this project requires. 
 
 ## Requirements for OpenEMR
@@ -58,10 +58,10 @@ If you are interested in using only some of the subsystems in this project witho
 
 ### Running the pathway view locally without openemr
 * Download and compile the peos kernel from github.com/jnoll/peos
-* Copy the compiled peos executable from peos/os/kernel into openemr/pathway/pathway
+* Copy the compiled peos executable from peos/os/kernel into openemr/interface/patient_file/carepathways/pathway
 * Copy files from "javascripts" and "path" folders to webserver's root folder
-* ` cp openemr/pathway/javascripts /var/www/html/ -rf`
-* ` cp openemr/pathway/pathway /var/www/html/ -rf`
+* ` cp openemr/interface/patient_file/carepathways/javascripts /var/www/html/ -rf`
+* ` cp openemr/interface/patient_file/carepathways/ /var/www/html/ -rf`
 * Provide permissions for the webserver to r/w/x the files in the folders
 * `chown www-data javascripts`
 * `chown www-data pathway`
