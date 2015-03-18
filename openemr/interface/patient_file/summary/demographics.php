@@ -577,7 +577,7 @@ if ($GLOBALS['patient_id_category_name']) {
 <?php echo htmlspecialchars(xl('Issues'),ENT_NOQUOTES); ?></a>
 |
 <?php                            // this is cs4098 peos project code
-echo '<a href="/path/patienttable.php?pid=' .     # opens this address new tab
+echo '<a href="../carepathway/pathways.php?pid=' .     # opens this address new tab
       $pid .                     // patient id is appended
       '">';       // remove target="_blank" for openemr integration
 echo htmlspecialchars(xl('Pathways'),ENT_NOQUOTES); ?></a> 
