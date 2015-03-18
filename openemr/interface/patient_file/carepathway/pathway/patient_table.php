@@ -57,7 +57,7 @@
 
     for (i =0; i< files.length;i++){
       file = files[i];
-      pid = file.match(/\d/);
+      pid = file.match(/\d+/);
       //document.write(file + "<br>");
       
       if (window.XMLHttpRequest){
