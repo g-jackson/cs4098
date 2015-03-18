@@ -115,6 +115,32 @@ marker#arrow {
 		}
 	}
 
+	function createActionButtons(d) {
+		var button_div = document.createElement("div");
+		button_div.setAttribute("id", "action_buttons");
+		button_div.innerHTML = "<br />";
+
+	    var button = document.createElement("input");
+	    button.type = "button";
+	    button.value = "Start Action";
+	    button.onclick = function(){
+		    alert('Starting action ' + d._name);
+		    return false;
+		};
+		button_div.appendChild(button);
+
+		var button = document.createElement("input");
+	    button.type = "button";
+	    button.value = "Finish Action";
+	    button.onclick = function(){
+		    alert('Finishing action ' + d._name);
+		    return false;
+		};
+		button_div.appendChild(button);
+
+	    document.getElementById("selected_action").appendChild(button_div);
+	}
+
 	function creatLinkForReqResource(process_data, req_resource_name, req_resource_action_index) {
 		
 
@@ -182,9 +208,10 @@ marker#arrow {
 		}
 	}
 
+	var node_count;
+
 	function load_path_data(id) {
 		var xmlhttp;
-		var txt,x,xx,i;
 		if (window.XMLHttpRequest){// code for IE7+, Firefox, Chrome, Opera, Safari
 		  xmlhttp=new XMLHttpRequest();
 		} else {// code for IE6, IE5
@@ -203,8 +230,11 @@ marker#arrow {
 					process_data = proc_table.process_table.process;
 				}
 				
+				node_count = process_data.action.length;
+				// alert('node_count: ' + node_count);
+
 				generateLinks(process_data);
-				//alert(JSON.stringify(links));
+				// alert(JSON.stringify(links));
 
 				force
 					.nodes(process_data.action)
@@ -222,6 +252,7 @@ marker#arrow {
 					.enter().append("circle")
 					.attr("class", "node")
 					.attr("r", NODE_RADIUS)
+				
 					.style("fill", function(d) {
 						return get_state_colour(d);
 					})
@@ -245,6 +276,11 @@ marker#arrow {
 						// display script
 						document.getElementById("selected_action_script").innerHTML = d.script;
 
+						// clear previous action buttons
+						var buttons = document.getElementById("action_buttons");
+						if (buttons != null) {
+							buttons.parentNode.removeChild(buttons);
+						}
 						// clear previously listed resources
 						var resources = document.getElementById("req_resources");
 						if (resources != null) {
@@ -297,6 +333,9 @@ marker#arrow {
 							}
 						}
 
+						// display button
+						createActionButtons(d);
+
 						prev_click = this;
 					})
 					.call(force.drag);
@@ -304,14 +343,39 @@ marker#arrow {
 				node.append("title")
 				  .text(function(d) { return d._name; });
 
+				
+
 				force.on("tick", function() {
+
+
+					node.attr("cx", function(d) {
+							if (d.index === 0) {
+								d.x = 0+100;
+								return d.x;
+							} else if (d.index === node_count - 1) {
+								d.x = width-100;
+								return d.x;
+							} else {
+								return d.x;
+							}
+						})
+						.attr("cy", function(d) { 
+							if (d.index === 0) {
+								d.y = height/2;
+								return d.y;
+							} else if (d.index === node_count - 1) {
+								d.y = height/2;
+								return d.y;
+							} else {
+								return d.y;
+							} 
+						});
 					link.attr("x1", function(d) { return d.source.x; })
 						.attr("y1", function(d) { return d.source.y; })
 						.attr("x2", function(d) { return d.target.x; })
 						.attr("y2", function(d) { return d.target.y; });
-					node.attr("cx", function(d) { return d.x; })
-						.attr("cy", function(d) { return d.y; });
 				});
+
 			}
 		}
 		xmlhttp.open("GET",proc_table_loc,true);
@@ -319,10 +383,12 @@ marker#arrow {
 	}
 
 	load_path_data(proc);
+	
 
 	var force = d3.layout.force()
-		.charge(-120)
-		.linkDistance(50)
+		.gravity(0)
+		.charge(0)
+		.linkStrength(0)
 		.size([width, height]);
 
 	var svg = d3.select("#pathview").append("svg")
@@ -342,6 +408,10 @@ marker#arrow {
 			}
 			
 			// clear and hide selected action box
+			var buttons = document.getElementById("action_buttons");
+			if (buttons != null) {
+				buttons.parentNode.removeChild(buttons);
+			}
 			var resources = document.getElementById("resources");
 			if (resources != null) {
 				resources.parentNode.removeChild(resources);
