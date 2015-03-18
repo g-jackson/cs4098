@@ -222,3 +222,6 @@ pip-log.txt
 stdout
 *.dat
 peos/os/kernel/libpeos.a
+
+#openemr config file
+openemr/sites/default/sqlconf.php
