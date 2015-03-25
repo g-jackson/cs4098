@@ -8,13 +8,6 @@ takes the output and finds the process id of the resulting process from it
 outputs that process id
 -->
 <script src="../javascripts/jquery.min.js"></script> 
-    <script> 
-    $(function(){
-      $("#navbar").load("navbar.html"); 
-    });
-    </script> 
-<div id="navbar"></div>
-<br>
 
 <?php
 
@@ -25,6 +18,9 @@ for ($i = 0; $i < sizeof($arr); $i++) {
 	$split = explode(".", $arr[$i]);
 	if(sizeof($split) == 2 && $split[1] == "pml") $pml_opts[$j++] = $split[0];
 }
+
+$pid = $_GET[pid];
+
 ?>
 
 <html>
@@ -32,10 +28,10 @@ for ($i = 0; $i < sizeof($arr); $i++) {
         <link rel="stylesheet" type="text/css" href="main.css">
 </head>
 <body>
-<br>
-	<form action="addprocesssubmit.php" method="post">
-		Patient ID: <input name="ID" type="text"></input>
-		<br>
+	Patient ID = <?php echo $pid ?>
+	<br>
+	<br>
+	<form action="addprocesssubmit.php?pid=<?php echo $pid ?>" method="post">
 		PML:
 		<select name="pml"> 
 			<?php
@@ -46,5 +42,11 @@ for ($i = 0; $i < sizeof($arr); $i++) {
 		<br>
 		<input type="submit">
 	</form>
+
+	<center>
+	<a href="../pathways.php?pid=<?php echo $pid ?>">Patient Pathway List</a>
+	</center>
+
+
 </body>
 </html>

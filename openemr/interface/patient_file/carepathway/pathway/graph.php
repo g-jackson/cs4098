@@ -67,15 +67,6 @@ marker#arrow {
 	<script src="../javascripts/xml2json.min.js"></script>
 </head>
 
-<script src="../javascripts/jquery.min.js"></script> 
-    <script> 
-    $(function(){
-      $("#navbar").load("navbar.html"); 
-    });
-    </script> 
-<div id="navbar"></div>
-<br>
-
 <body>
 
 
@@ -580,5 +571,10 @@ Actions:
 	</svg>
 	
 </div>
+
+<br>
+<center>
+<a href="../pathways.php?pid=<?php echo $pid ?>">Patient Pathway List</$
+</center>
 
 </body>

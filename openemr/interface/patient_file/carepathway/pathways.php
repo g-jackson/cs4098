@@ -1,19 +1,4 @@
-<style>
-li {
-    display: inline;
-}
-ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-}
-</style>
-<ul>
-  <li><a href="pathway/patient_table.php">Home</a> |</li>
-  <li><a href="pathway/addpath.php">Add .pml</a> |</li>
-  <li><a href="pathway/addprocess.php">Add Pathway</a> |</li>
-  <li><a href="pathway/search.php">Search For Patient</a></li>
-</ul>
+<?php $pid = $_GET[pid] ?>
 
 <html>
   <head>
@@ -22,18 +7,9 @@ ul {
   </head>
   <body>
 
-  <style>
-    /*table, tr, td
-    {
-      border: 1px solid black;
-        border-collapse: collapse;
-    }*/
-  </style>
-
   <!-- get pid for passing to js -->
   <div id="dom-target" style="display: none;">
     <?php 
-        $pid = $_GET[pid];
         echo htmlspecialchars($pid); 
     ?>
   </div>
@@ -86,5 +62,13 @@ ul {
       }
     document.write("</table>");
   </script>
+
+  <br>
+  <br>
+
+  <center>
+  <a href="pathway/addprocess.php?pid=<?php echo $pid ?>">Add New Pathway</a>
+  </center>
+
   </body>
 </html>
