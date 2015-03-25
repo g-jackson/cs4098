@@ -11,6 +11,8 @@
   <div id="dom-target" style="display: none;">
     <?php 
         echo htmlspecialchars($pid); 
+        header("Cache-Control: no-cache, must-revalidate");
+        header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
     ?>
   </div>
 
