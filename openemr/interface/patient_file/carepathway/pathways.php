@@ -53,7 +53,7 @@
       row_count++;
       document.write(x[i].getAttribute("pid"));
       document.write("</td><td>");
-      document.write(x[i].getAttribute("model"));
+      document.write(x[i].getAttribute("model").split(".")[1].split("/")[2].replace("_"," "));
       document.write("</td><td>");
       document.write(x[i].getAttribute("status"));
       document.write("</td><td>");
