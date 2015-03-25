@@ -2,6 +2,28 @@
 <meta charset="utf-8">
 <style>
 
+table {
+    width:100%;
+}
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 5px;
+    text-align: left;
+}
+table#action_list_table tr:nth-child(even) {
+    background-color: #eee;
+}
+table#action_list_table tr:nth-child(odd) {
+   background-color:#fff;
+}
+table#action_list_table th	{
+    background-color: #FFAC84;
+    color: black;
+}
+
 #pathview {
 	position: relative;
 	width: 960px;
@@ -37,6 +59,14 @@ marker#arrow {
 
 </style>
 
+
+<head>
+	<link rel="stylesheet" type="text/css" href="main.css">
+
+	<script src="../javascripts/d3.min.js"></script>
+	<script src="../javascripts/xml2json.min.js"></script>
+</head>
+
 <script src="../javascripts/jquery.min.js"></script> 
     <script> 
     $(function(){
@@ -46,14 +76,7 @@ marker#arrow {
 <div id="navbar"></div>
 <br>
 
-<head>
-        <link rel="stylesheet" type="text/css" href="main.css">
-</head>
-
 <body>
-
-<script src="../javascripts/d3.min.js"></script>
-<script src="../javascripts/xml2json.min.js"></script>
 
 
 <!-- get pid for passing to js -->
@@ -76,6 +99,29 @@ marker#arrow {
 	document.write("<br>file = " + file);
 	document.write("<br>process = " + proc);
 </script>
+
+<br/>
+<br/>
+<div id="action_list" >
+Actions:
+
+<table id="action_list_table">
+<thead>
+	<tr>
+		<th onclick="listActionsByName()">Name</th>
+		<th onclick="listActionsByState()">State</th>		
+	</tr>
+</thead>
+<tbody id="action_list_table_body">
+	<tr>
+		<td>test name</td>
+		<td>test state</td>		
+	</tr>
+</tbody>
+</table>
+
+</div>
+<br/>
 
 <div id="pathview">
 
@@ -117,6 +163,127 @@ marker#arrow {
 		} else {
 			return "grey";
 		}
+	}
+
+	function createActionButtons(d) {
+		var button_div = document.createElement("div");
+		button_div.setAttribute("id", "action_buttons");
+		button_div.innerHTML = "<br />";
+
+	    var button = document.createElement("input");
+	    button.type = "button";
+	    button.value = "Start Action";
+	    button.onclick = function(){
+		    alert('Starting action ' + d._name);
+		    return false;
+		};
+		button_div.appendChild(button);
+
+		var button = document.createElement("input");
+	    button.type = "button";
+	    button.value = "Finish Action";
+	    button.onclick = function(){
+		    alert('Finishing action ' + d._name);
+		    return false;
+		};
+		button_div.appendChild(button);
+
+	    document.getElementById("selected_action").appendChild(button_div);
+	}
+
+	var actions = [];
+	function parseActions(process_data) {
+		if (process_data == null) {
+			return;
+		}
+
+		parseActions(process_data.iteration);
+
+		if (process_data.action == null) { // no actions
+			// nothing to link
+		} else if (process_data.action.length >= 2) { // list of actions
+			for (var i = 0; i < process_data.action.length; i++) {
+				actions.push(process_data.action[i]);
+			}
+		} else { // only one action
+			actions.push(process_data.action);
+		}
+
+	}
+
+	var listed_as = "";
+	function listActionsByName() {
+
+		var Arr = actions.slice(0);
+		if (listed_as === "name_a2z") {
+			Arr.sort(function(a, b){return b._name.localeCompare(a._name)});
+			listed_as = "name_z2a";
+		} else if (listed_as === "name_z2a" ) {
+			Arr.sort(function(a, b){return a._name.localeCompare(b._name)});
+			listed_as = "name_a2z";
+		} else { // default
+			Arr.sort(function(a, b){return a._name.localeCompare(b._name)});	
+			listed_as = "name_a2z";
+		}
+
+	    listActionsInTable(Arr);
+	};
+
+	function listActionsByState() {
+		
+		var Arr = actions.slice(0);
+		if (listed_as === "state_a2z") {
+			Arr.sort(function(a, b){return b._state.localeCompare(a._state)});
+			listed_as = "state_z2a";
+		} else if (listed_as === "state_z2a" ) {
+			Arr.sort(function(a, b){return a._state.localeCompare(b._state)});
+			listed_as = "state_a2z";
+		} else { // default
+			Arr.sort(function(a, b){return a._state.localeCompare(b._state)});
+			listed_as = "state_a2z";
+		}
+
+		listActionsInTable(Arr);	    
+	};
+
+	function listActionsInTable(actions) {
+		if (actions == null) {
+			return;
+		}
+
+		var tbody = document.createElement('tbody');
+		tbody.setAttribute("id", "action_list_table_body");
+
+		var tr, td;
+		if (actions.length >= 2) { // list of actions
+
+			for (var i = 0; i < actions.length; i++) {
+				tr = document.createElement('tr');
+				td = document.createElement('td');
+				td.appendChild(document.createTextNode(actions[i]._name))
+				tr.appendChild(td)
+				td = document.createElement('td');
+				td.appendChild(document.createTextNode(actions[i]._state))
+				td.style.color = get_state_colour(actions[i]);
+				tr.appendChild(td)
+				tbody.appendChild(tr);
+			}
+
+		} else { // only one action
+
+			tr = document.createElement('tr');
+			td = document.createElement('td');
+			td.appendChild(document.createTextNode(actions._name))
+			tr.appendChild(td)
+			td = document.createElement('td');
+			td.appendChild(document.createTextNode(actions._state))
+			td.style.color = get_state_colour(actions);
+			tr.appendChild(td)
+			tbody.appendChild(tr);
+		}
+
+		var old_tbody = document.getElementById("action_list_table_body");
+		old_tbody.parentNode.replaceChild(tbody, old_tbody)
 	}
 
 	function creatLinkForReqResource(process_data, req_resource_name, req_resource_action_index) {
@@ -186,16 +353,17 @@ marker#arrow {
 		}
 	}
 
+
+
 	function load_path_data(id) {
 		var xmlhttp;
-		var txt,x,xx,i;
 		if (window.XMLHttpRequest){// code for IE7+, Firefox, Chrome, Opera, Safari
 		  xmlhttp=new XMLHttpRequest();
 		} else {// code for IE6, IE5
 		  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
 		}
 		xmlhttp.onreadystatechange=function(){
-			if (xmlhttp.readyState==4 && xmlhttp.status==200){
+			if (xmlhttp.readyState==4 && xmlhttp.status==200) {
 
 				var xml_string = new XMLSerializer().serializeToString(xmlhttp.responseXML.documentElement);
 				var proc_table = x2js.xml_str2json(xml_string);
@@ -206,12 +374,36 @@ marker#arrow {
 				} else {
 					process_data = proc_table.process_table.process;
 				}
+
+				//alert(JSON.stringify(process_data[0]));
+				parseActions(process_data);
+				//alert(JSON.stringify(actions));
 				
 				generateLinks(process_data);
-				//alert(JSON.stringify(links));
+				// alert(JSON.stringify(links));
+
+				listActionsInTable(actions);
+
+				if ( actions.length >= 2 ) {
+					var length = actions.length;
+
+					// give first node a fixed position
+					actions[0].x = 100;
+					actions[0].y = height/2;
+					actions[0].fixed = true;
+
+					// give last node a fixed position
+					actions[length-1].x = width-100;
+					actions[length-1].y = height/2;
+					actions[length-1].fixed = true;
+				}
 
 				force
-					.nodes(process_data.action)
+					.gravity(0)
+					.charge(15)
+					.linkStrength(0.1)
+					.chargeDistance(5)
+					.nodes(actions)
 					.links(links)
 					.start();
 
@@ -222,10 +414,11 @@ marker#arrow {
 					.attr("marker-end", "url(#arrow)");
 
 				var node = svg.selectAll(".node")
-					.data(process_data.action)
+					.data(actions)
 					.enter().append("circle")
 					.attr("class", "node")
 					.attr("r", NODE_RADIUS)
+				
 					.style("fill", function(d) {
 						return get_state_colour(d);
 					})
@@ -249,6 +442,11 @@ marker#arrow {
 						// display script
 						document.getElementById("selected_action_script").innerHTML = d.script;
 
+						// clear previous action buttons
+						var buttons = document.getElementById("action_buttons");
+						if (buttons != null) {
+							buttons.parentNode.removeChild(buttons);
+						}
 						// clear previously listed resources
 						var resources = document.getElementById("req_resources");
 						if (resources != null) {
@@ -301,6 +499,9 @@ marker#arrow {
 							}
 						}
 
+						// display button
+						createActionButtons(d);
+
 						prev_click = this;
 					})
 					.call(force.drag);
@@ -308,14 +509,18 @@ marker#arrow {
 				node.append("title")
 				  .text(function(d) { return d._name; });
 
+				
+
 				force.on("tick", function() {
 					link.attr("x1", function(d) { return d.source.x; })
 						.attr("y1", function(d) { return d.source.y; })
 						.attr("x2", function(d) { return d.target.x; })
 						.attr("y2", function(d) { return d.target.y; });
+
 					node.attr("cx", function(d) { return d.x; })
 						.attr("cy", function(d) { return d.y; });
 				});
+
 			}
 		}
 		xmlhttp.open("GET",proc_table_loc,true);
@@ -323,15 +528,18 @@ marker#arrow {
 	}
 
 	load_path_data(proc);
+	
 
 	var force = d3.layout.force()
-		.charge(-120)
-		.linkDistance(50)
+		
 		.size([width, height]);
 
 	var svg = d3.select("#pathview").append("svg")
 		.attr("width", width)
 		.attr("height", height);
+
+	var drag = force.drag()
+		.on("dragstart", dragstart); 
 
 	// draw grey background
 	svg.append("rect")
@@ -346,12 +554,21 @@ marker#arrow {
 			}
 			
 			// clear and hide selected action box
+			var buttons = document.getElementById("action_buttons");
+			if (buttons != null) {
+				buttons.parentNode.removeChild(buttons);
+			}
 			var resources = document.getElementById("resources");
 			if (resources != null) {
 				resources.parentNode.removeChild(resources);
 			}
 			document.getElementById("selected_action").style.visibility = "hidden";
 		});
+
+	function dragstart(d) {
+		d3.select(this).classed("fixed", d.fixed = true);
+	} 
+	
 	</script>
 
 	<svg id="something_important_for_arrows">
