@@ -69,7 +69,6 @@ marker#arrow {
 
 <body>
 
-
 <!-- get pid for passing to js -->
 <div id="dom-target" style="display: none;">
 <?php 
@@ -78,6 +77,12 @@ marker#arrow {
 	echo htmlspecialchars($pid . " " . $procid);
 ?>
 </div>
+
+<?php 
+$retour .= "<a href='../pathways.php?pid=".$pid."'>Back to Patient Pathway List</a>";
+echo $retour;
+?>
+<br/>
 
 <script>
 	var div = document.getElementById("dom-target");
@@ -185,21 +190,102 @@ Actions:
 	var actions = [];
 	function parseActions(process_data) {
 		if (process_data == null) {
-			return;
+			return [];
 		}
 
-		parseActions(process_data.iteration);
+		var acts = [];
+		var more_acts;
+
+		// handle iterations
+		more_acts = parseActions(process_data.iteration);
+		acts.push.apply(acts, more_acts);
 
 		if (process_data.action == null) { // no actions
 			// nothing to link
 		} else if (process_data.action.length >= 2) { // list of actions
 			for (var i = 0; i < process_data.action.length; i++) {
-				actions.push(process_data.action[i]);
+				var link = {};
+				link.source = acts.length-1;
+				acts.push(process_data.action[i]);
+				link.target = acts.length-1;
+				if (i > 0) {
+					links.push(link);	
+				}
+				
 			}
 		} else { // only one action
-			actions.push(process_data.action);
+			acts.push(process_data.action);
 		}
 
+		return acts;
+	}
+
+	function parseActions2(process_data) {
+		if (process_data == null) {
+			return [];
+		}
+
+		var acts = [];
+		var more_acts;
+
+  		var x = process_data.childNodes;
+
+  		var link_stack = [];
+		for (var i = 0; i < x.length; i++) {
+			if (x[i].nodeName === "action") {
+				
+				var xml_string = new XMLSerializer().serializeToString(x[i]);
+				var action = x2js.xml_str2json(xml_string);
+				acts.push(action);
+				
+				if (link_stack.length >= 1) {
+					var link = {};
+					link.source = link_stack.pop();					
+					link.target = acts.length-1;
+					links.push(link);
+				}
+
+				link_stack.push(acts.length-1);
+
+			} else if (x[i].nodeName === "branch") {
+				alert("branch");
+			} else if (x[i].nodeName === "selection") {
+				alert("selection");
+
+			} else if (x[i].nodeName === "iteration") {
+
+				var more_acts = parseActions2(x[i]);
+				acts.push.apply(acts, more_acts);
+
+				if (link_stack.length >= 1) {
+					var link = {};
+					link.source = link_stack.pop();					
+					link.target = acts.length-1;
+					links.push(link);
+				}
+
+				link_stack.push(acts.length-1);
+
+				// add decision node
+
+			} else if (x[i].nodeName === "sequence") {
+
+				var more_acts = parseActions2(x[i]);
+				acts.push.apply(acts, more_acts);
+
+				if (link_stack.length >= 1) {
+					var link = {};
+					link.source = link_stack.pop();					
+					link.target = acts.length-1;
+					links.push(link);
+				}
+
+				link_stack.push(acts.length-1);
+
+			}
+		}
+
+		return acts;
 	}
 
 	var listed_as = "";
@@ -207,13 +293,13 @@ Actions:
 
 		var Arr = actions.slice(0);
 		if (listed_as === "name_a2z") {
-			Arr.sort(function(a, b){return b._name.localeCompare(a._name)});
+			Arr.sort(function(a, b){return b.action._name.localeCompare(a.action._name)});
 			listed_as = "name_z2a";
 		} else if (listed_as === "name_z2a" ) {
-			Arr.sort(function(a, b){return a._name.localeCompare(b._name)});
+			Arr.sort(function(a, b){return a.action._name.localeCompare(b.action._name)});
 			listed_as = "name_a2z";
 		} else { // default
-			Arr.sort(function(a, b){return a._name.localeCompare(b._name)});	
+			Arr.sort(function(a, b){return a.action._name.localeCompare(b.action._name)});	
 			listed_as = "name_a2z";
 		}
 
@@ -224,13 +310,13 @@ Actions:
 		
 		var Arr = actions.slice(0);
 		if (listed_as === "state_a2z") {
-			Arr.sort(function(a, b){return b._state.localeCompare(a._state)});
+			Arr.sort(function(a, b){return b.action._state.localeCompare(a.action._state)});
 			listed_as = "state_z2a";
 		} else if (listed_as === "state_z2a" ) {
-			Arr.sort(function(a, b){return a._state.localeCompare(b._state)});
+			Arr.sort(function(a, b){return a.action._state.localeCompare(b.action._state)});
 			listed_as = "state_a2z";
 		} else { // default
-			Arr.sort(function(a, b){return a._state.localeCompare(b._state)});
+			Arr.sort(function(a, b){return a.action._state.localeCompare(b.action._state)});
 			listed_as = "state_a2z";
 		}
 
@@ -245,30 +331,14 @@ Actions:
 		var tbody = document.createElement('tbody');
 		tbody.setAttribute("id", "action_list_table_body");
 
-		var tr, td;
-		if (actions.length >= 2) { // list of actions
-
-			for (var i = 0; i < actions.length; i++) {
-				tr = document.createElement('tr');
-				td = document.createElement('td');
-				td.appendChild(document.createTextNode(actions[i]._name))
-				tr.appendChild(td)
-				td = document.createElement('td');
-				td.appendChild(document.createTextNode(actions[i]._state))
-				td.style.color = get_state_colour(actions[i]);
-				tr.appendChild(td)
-				tbody.appendChild(tr);
-			}
-
-		} else { // only one action
-
+		for (var i = 0; i < actions.length; i++) {
 			tr = document.createElement('tr');
 			td = document.createElement('td');
-			td.appendChild(document.createTextNode(actions._name))
+			td.appendChild(document.createTextNode(actions[i].action._name))
 			tr.appendChild(td)
 			td = document.createElement('td');
-			td.appendChild(document.createTextNode(actions._state))
-			td.style.color = get_state_colour(actions);
+			td.appendChild(document.createTextNode(actions[i].action._state))
+			td.style.color = get_state_colour(actions[i].action);
 			tr.appendChild(td)
 			tbody.appendChild(tr);
 		}
@@ -356,6 +426,19 @@ Actions:
 		xmlhttp.onreadystatechange=function(){
 			if (xmlhttp.readyState==4 && xmlhttp.status==200) {
 
+				var xmlData=xmlhttp.responseXML.documentElement;
+				//var x=xmlDoc.getElementsByTagName("action")[0].childNodes;
+				var x = xmlData.getElementsByTagName("process");
+				//alert(x.length);				
+
+				var proc_data;
+				for (i = 0; i < x.length; i++){
+					if (x[i].getAttribute("pid") === id) {
+						proc_data = x[i];
+					}
+				}
+				//alert(proc_data.getAttribute("model"));					
+
 				var xml_string = new XMLSerializer().serializeToString(xmlhttp.responseXML.documentElement);
 				var proc_table = x2js.xml_str2json(xml_string);
 
@@ -366,11 +449,14 @@ Actions:
 					process_data = proc_table.process_table.process;
 				}
 
-				//alert(JSON.stringify(process_data[0]));
-				parseActions(process_data);
+				//alert(JSON.stringify(process_data));
+				//actions = parseActions(process_data);
+				//alert(JSON.stringify(actions));
+
+				actions = parseActions2(proc_data);
 				//alert(JSON.stringify(actions));
 				
-				generateLinks(process_data);
+				// generateLinks(process_data);
 				// alert(JSON.stringify(links));
 
 				listActionsInTable(actions);
@@ -404,14 +490,19 @@ Actions:
 					.attr("class", "link")
 					.attr("marker-end", "url(#arrow)");
 
-				var node = svg.selectAll(".node")
+				var node = svg.selectAll("path")
 					.data(actions)
-					.enter().append("circle")
+					.enter().append("path")
+					.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+					.attr("d", d3.svg.symbol()
+				        .size(function(d) { return 500;})
+				        .type(function(d) { return "diamond"; }))
+					//.enter().append("circle")
 					.attr("class", "node")
-					.attr("r", NODE_RADIUS)
+					//.attr("r", NODE_RADIUS)
 				
 					.style("fill", function(d) {
-						return get_state_colour(d);
+						return get_state_colour(d.action);
 					})
 					.on("click", function(d) {
 						// resize last circle clicked on
@@ -424,14 +515,14 @@ Actions:
 						document.getElementById("selected_action").style.visibility = "visible";
 			
 						// display name
-						document.getElementById("selected_action_name").innerHTML = d._name;
+						document.getElementById("selected_action_name").innerHTML = d.action._name;
 			
 						// display state with colour
-						document.getElementById("selected_action_state").innerHTML = d._state;
-						document.getElementById("selected_action_state").style.color = get_state_colour(d);
+						document.getElementById("selected_action_state").innerHTML = d.action._state;
+						document.getElementById("selected_action_state").style.color = get_state_colour(d.action);
 			
 						// display script
-						document.getElementById("selected_action_script").innerHTML = d.script;
+						document.getElementById("selected_action_script").innerHTML = d.action.script;
 
 						// clear previous action buttons
 						var buttons = document.getElementById("action_buttons");
@@ -453,18 +544,18 @@ Actions:
 						resources.setAttribute("id", "req_resources");
 						resources.innerHTML = "<br /> Required Resoures:";
 						document.getElementById("selected_action").appendChild(resources);
-						if (d.req_resource != null) {
-							if (d.req_resource.length >= 2) { // display list of resources
-								for (var i = 0; i < d.req_resource.length; i++) {
+						if (d.action.req_resource != null) {
+							if (d.action.req_resource.length >= 2) { // display list of resources
+								for (var i = 0; i < d.action.req_resource.length; i++) {
 									var resource = document.createElement("div");
 									resource.setAttribute("id", "resource"+i);
-									resource.innerHTML = d.req_resource[i]._name;
+									resource.innerHTML = d.action.req_resource[i]._name;
 									resources.appendChild(resource);
 								}
 							} else { // display only one resource
 								var resource = document.createElement("div");
 								resource.setAttribute("id", "resource");
-								resource.innerHTML = d.req_resource._name;
+								resource.innerHTML = d.action.req_resource._name;
 								resources.appendChild(resource);								
 							}
 						}
@@ -474,35 +565,38 @@ Actions:
 						resources.setAttribute("id", "prov_resources");
 						resources.innerHTML = "<br /> Provided Resoures:";
 						document.getElementById("selected_action").appendChild(resources);
-						if (d.prov_resource != null) {
-							if (d.prov_resource.length >= 2) { // display list of resources
-								for (var i = 0; i < d.prov_resource.length; i++) {
+						if (d.action.prov_resource != null) {
+							if (d.action.prov_resource.length >= 2) { // display list of resources
+								for (var i = 0; i < d.action.prov_resource.length; i++) {
 									var resource = document.createElement("div");
 									resource.setAttribute("id", "resource"+i);
-									resource.innerHTML = d.prov_resource[i]._name;
+									resource.innerHTML = d.action.prov_resource[i]._name;
 									resources.appendChild(resource);
 								}
 							} else { // display only one resource
 								var resource = document.createElement("div");
 								resource.setAttribute("id", "resource");
-								resource.innerHTML = d.prov_resource._name;
+								resource.innerHTML = d.action.prov_resource._name;
 								resources.appendChild(resource);								
 							}
 						}
 
 						// display button
-						createActionButtons(d);
+						createActionButtons(d.action);
 
 						prev_click = this;
 					})
 					.call(force.drag);
 
 				node.append("title")
-				  .text(function(d) { return d._name; });
+				  .text(function(d) { return d.action._name; });
 
 				
 
 				force.on("tick", function() {
+					svg.selectAll("path")
+      					.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
 					link.attr("x1", function(d) { return d.source.x; })
 						.attr("y1", function(d) { return d.source.y; })
 						.attr("x2", function(d) { return d.target.x; })
@@ -572,9 +666,6 @@ Actions:
 	
 </div>
 
-<br>
-<center>
-<a href="../pathways.php?pid=<?php echo $pid ?>">Patient Pathway List</$
-</center>
+
 
 </body>
