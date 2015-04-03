@@ -98,6 +98,39 @@ if (!empty($_POST['bn_save'])) {
     }
   }
 
+  // Handle PML uploads for patient pathway.
+$title = @$_POST[pathway_title];
+$file = @$_FILES[pathway];
+
+$target_dir = "../patient_file/carepathway/pathway/pml/";
+$target_file = $target_dir.$title.".pml";
+$fileType = pathinfo($file[name],PATHINFO_EXTENSION);
+
+$uploadOk = 1;
+
+// Check if file already exists
+if (file_exists($target_file)) {
+    echo "Sorry, file already exists.<br>";
+    $uploadOk = 0;
+}
+// Allow certain file formats
+if ($fileType != "pml") {
+    echo "Sorry, only PML files are allowed.<br>";
+    $uploadOk = 0;
+}
+// Check if $uploadOk is set to 0 by an error
+if ($uploadOk == 0) {
+    echo "Sorry, your file was not uploaded.<br>";
+// if everything is ok, try to upload file
+} else {
+    if (move_uploaded_file($file["tmp_name"], $target_file)) {
+        echo "The file ". basename( $title). "has been uploaded.";
+    } else {
+        echo "Sorry, there was an error uploading your file.<br>";
+    }
+}
+
+
 }
 ?>
 <html>
@@ -197,6 +230,16 @@ function msfFileChanged() {
    <?php echo xlt('Source File'); ?>:
    <input type="file" name="form_education" size="40" />&nbsp;
    <?php echo xlt('Name must be like codetype_code_language.pdf, for example icd9_274.11_en.pdf'); ?>
+  </td>
+ <tr bgcolor='#dddddd' class='dehead'>
+  <td colspan='2' align='center'><?php echo text(xl('Upload Pathway PML to /var/www/openemr/interface/patient_file/carepathway/pathway/pml')); ?></td>
+ </tr>
+ <tr>
+  <td valign='top' class='detail' nowrap>
+   <?php echo xlt('Source File'); ?>:
+   <input type="file" name="pathway" size="100" />&nbsp;
+   <?php echo htmlspecialchars(xl('Destination Filename')) ?>:
+   <input type="text" name="pathway_title" />
   </td>
  </tr>
 
