@@ -142,23 +142,32 @@ Actions:
 	var NODE_RADIUS = 8;
 	var SELECTED_NODE_RADIUS = 12;
 
+	var NODE_SIZE = 200;
+	var SELECTED_NODE_SIZE = 400;
+
 	var process_data;
 	var prev_click;
 
 	var links = [];
 
 	function get_state_colour(d) {
-		if (d._state == "BLOCKED") {
-			return "red";
-		} else if (d._state == "AVAILABLE") {
-			return "orange";
-		} else if (d._state == "READY") {
-			return "yellow";							
-		} else if (d._state == "COMPLETE") {
-			return "green";
-		} else {
+		if (d.action != null) {
+			if (d.action._state == "BLOCKED") {
+				return "red";
+			} else if (d.action._state == "AVAILABLE") {
+				return "orange";
+			} else if (d.action._state == "READY") {
+				return "yellow";							
+			} else if (d.action._state == "COMPLETE") {
+				return "green";
+			} else {
+				return "grey";
+			}
+		} else if (d.decision != null) {
 			return "grey";
 		}
+
+		return "black";
 	}
 
 	function createActionButtons(d) {
@@ -187,40 +196,7 @@ Actions:
 	    document.getElementById("selected_action").appendChild(button_div);
 	}
 
-	var actions = [];
 	function parseActions(process_data) {
-		if (process_data == null) {
-			return [];
-		}
-
-		var acts = [];
-		var more_acts;
-
-		// handle iterations
-		more_acts = parseActions(process_data.iteration);
-		acts.push.apply(acts, more_acts);
-
-		if (process_data.action == null) { // no actions
-			// nothing to link
-		} else if (process_data.action.length >= 2) { // list of actions
-			for (var i = 0; i < process_data.action.length; i++) {
-				var link = {};
-				link.source = acts.length-1;
-				acts.push(process_data.action[i]);
-				link.target = acts.length-1;
-				if (i > 0) {
-					links.push(link);	
-				}
-				
-			}
-		} else { // only one action
-			acts.push(process_data.action);
-		}
-
-		return acts;
-	}
-
-	function parseActions2(process_data) {
 		if (process_data == null) {
 			return [];
 		}
@@ -248,29 +224,51 @@ Actions:
 				link_stack.push(acts.length-1);
 
 			} else if (x[i].nodeName === "branch") {
-				alert("branch");
+
 			} else if (x[i].nodeName === "selection") {
-				alert("selection");
 
 			} else if (x[i].nodeName === "iteration") {
 
-				var more_acts = parseActions2(x[i]);
-				acts.push.apply(acts, more_acts);
+				var iteration_start = acts.length;
 
+				// retrieve actions from within iteration
+				var more_acts = parseActions(x[i]);
+
+				// add link to start of iteration
 				if (link_stack.length >= 1) {
 					var link = {};
 					link.source = link_stack.pop();					
 					link.target = acts.length-1;
 					links.push(link);
 				}
+				acts.push.apply(acts, more_acts);
+				link_stack.push(acts.length-1);
+
+				// add decision node to end of iteration
+				var act = {};
+				act.decision = {};
+				acts.push(act);
+
+				// add link to decision node from end of iteration
+				if (link_stack.length >= 1) {
+					var link = {};
+					link.source = link_stack.pop();
+					link.target = acts.length-1;
+					links.push(link);
+				}
+
+				// add link back to start of iteration
+				var link = {};
+				link.target = iteration_start;
+				link.source = acts.length-1;
+				links.push(link);
+
 
 				link_stack.push(acts.length-1);
 
-				// add decision node
-
 			} else if (x[i].nodeName === "sequence") {
 
-				var more_acts = parseActions2(x[i]);
+				var more_acts = parseActions(x[i]);
 				acts.push.apply(acts, more_acts);
 
 				if (link_stack.length >= 1) {
@@ -293,13 +291,13 @@ Actions:
 
 		var Arr = actions.slice(0);
 		if (listed_as === "name_a2z") {
-			Arr.sort(function(a, b){return b.action._name.localeCompare(a.action._name)});
+			Arr.sort(function(a, b){ return a.action === undefined ? -1 : b.action === undefined ? 1 : a.action._name.localeCompare(b.action._name); });
 			listed_as = "name_z2a";
 		} else if (listed_as === "name_z2a" ) {
-			Arr.sort(function(a, b){return a.action._name.localeCompare(b.action._name)});
+			Arr.sort(function(a, b){ return a.action === undefined ? 1 : b.action === undefined ? -1 : b.action._name.localeCompare(a.action._name); });
 			listed_as = "name_a2z";
 		} else { // default
-			Arr.sort(function(a, b){return a.action._name.localeCompare(b.action._name)});	
+			Arr.sort(function(a, b){ return a.action === undefined ? -1 : b.action === undefined ? 1 : a.action._name.localeCompare(b.action._name); });
 			listed_as = "name_a2z";
 		}
 
@@ -310,13 +308,13 @@ Actions:
 		
 		var Arr = actions.slice(0);
 		if (listed_as === "state_a2z") {
-			Arr.sort(function(a, b){return b.action._state.localeCompare(a.action._state)});
+			Arr.sort(function(a, b){ return a.action === undefined ? -1 : b.action === undefined ? 1 : a.action._state.localeCompare(b.action._state); });
 			listed_as = "state_z2a";
 		} else if (listed_as === "state_z2a" ) {
-			Arr.sort(function(a, b){return a.action._state.localeCompare(b.action._state)});
+			Arr.sort(function(a, b){ return a.action === undefined ? 1 : b.action === undefined ? -1 : b.action._state.localeCompare(a.action._state); });
 			listed_as = "state_a2z";
 		} else { // default
-			Arr.sort(function(a, b){return a.action._state.localeCompare(b.action._state)});
+			Arr.sort(function(a, b){ return a.action === undefined ? -1 : b.action === undefined ? 1 : a.action._state.localeCompare(b.action._state); });
 			listed_as = "state_a2z";
 		}
 
@@ -332,86 +330,21 @@ Actions:
 		tbody.setAttribute("id", "action_list_table_body");
 
 		for (var i = 0; i < actions.length; i++) {
-			tr = document.createElement('tr');
-			td = document.createElement('td');
-			td.appendChild(document.createTextNode(actions[i].action._name))
-			tr.appendChild(td)
-			td = document.createElement('td');
-			td.appendChild(document.createTextNode(actions[i].action._state))
-			td.style.color = get_state_colour(actions[i].action);
-			tr.appendChild(td)
-			tbody.appendChild(tr);
+			if (actions[i].action != null) {
+				tr = document.createElement('tr');
+				td = document.createElement('td');
+				td.appendChild(document.createTextNode(actions[i].action._name))
+				tr.appendChild(td)
+				td = document.createElement('td');
+				td.appendChild(document.createTextNode(actions[i].action._state))
+				td.style.color = get_state_colour(actions[i]);
+				tr.appendChild(td)
+				tbody.appendChild(tr);
+			}
 		}
 
 		var old_tbody = document.getElementById("action_list_table_body");
 		old_tbody.parentNode.replaceChild(tbody, old_tbody)
-	}
-
-	function creatLinkForReqResource(process_data, req_resource_name, req_resource_action_index) {
-		
-
-		// for each action
-		for (var act_j = 0; act_j < process_data.action.length; act_j++) {
-
-			// search through required provided resources
-			if (process_data.action[act_j].prov_resource == null) { // no provided resources
-				// nothing to link
-			} else if (process_data.action[act_j].prov_resource.length >= 2) { // list of resources
-
-				// and link them to actions providing that resource
-				for (var res_i = 0; res_i < process_data.action[act_j].prov_resource.length; res_i++) {
-					var resource_name = process_data.action[act_j].prov_resource[res_i]._name;
-					if (req_resource_name === resource_name) {
-						var link = {};
-						link.source = act_j;
-						link.target = req_resource_action_index;
-						links.push(link);
-					}
-				}
-
-			} else { // only one resource
-				var resource_name = process_data.action[act_j].prov_resource._name;
-				if (req_resource_name === resource_name) {
-					var link = {};
-					link.source = act_j;
-					link.target = req_resource_action_index;
-					links.push(link);
-				}
-			}
-			
-		}
-	}
-
-	function generateLinks(process_data) {
-		// nothing to link if only one action or less
-		if (process_data.action === null) {
-			return;
-		} 
-
-		if (process_data.action.length >= 2) {
-			
-			// for each action
-			for (var act_i = 0; act_i < process_data.action.length; act_i++) {
-
-				// search through required required resources
-				if (process_data.action[act_i].req_resource == null) { // no required resources
-					// nothing to link
-				} else if (process_data.action[act_i].req_resource.length >= 2) { // list of resources
-
-					// and link them to actions providing that resource
-					for (var res_i = 0; res_i < process_data.action[act_i].req_resource.length; res_i++) {
-						var resource_name = process_data.action[act_i].req_resource[res_i]._name;
-						creatLinkForReqResource(process_data, resource_name, act_i);
-					}
-
-				} else { // only one resource
-					var resource_name = process_data.action[act_i].req_resource._name;
-					creatLinkForReqResource(process_data, resource_name, act_i);
-				}
-				
-			}
-
-		}
 	}
 
 
@@ -427,7 +360,7 @@ Actions:
 			if (xmlhttp.readyState==4 && xmlhttp.status==200) {
 
 				var xmlData=xmlhttp.responseXML.documentElement;
-				//var x=xmlDoc.getElementsByTagName("action")[0].childNodes;
+				
 				var x = xmlData.getElementsByTagName("process");
 				//alert(x.length);				
 
@@ -449,15 +382,8 @@ Actions:
 					process_data = proc_table.process_table.process;
 				}
 
-				//alert(JSON.stringify(process_data));
-				//actions = parseActions(process_data);
+				actions = parseActions(proc_data);
 				//alert(JSON.stringify(actions));
-
-				actions = parseActions2(proc_data);
-				//alert(JSON.stringify(actions));
-				
-				// generateLinks(process_data);
-				// alert(JSON.stringify(links));
 
 				listActionsInTable(actions);
 
@@ -477,9 +403,8 @@ Actions:
 
 				force
 					.gravity(0)
-					.charge(15)
-					.linkStrength(0.1)
-					.chargeDistance(5)
+					.linkStrength(0.5)
+					.linkDistance(100)
 					.nodes(actions)
 					.links(links)
 					.start();
@@ -495,101 +420,108 @@ Actions:
 					.enter().append("path")
 					.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
 					.attr("d", d3.svg.symbol()
-				        .size(function(d) { return 500;})
-				        .type(function(d) { return "diamond"; }))
+				        .size(function(d) { return NODE_SIZE;})
+				        .type(function(d) { if (d.action !=null ) {return "circle";} else {return "diamond";} }))
 					//.enter().append("circle")
 					.attr("class", "node")
 					//.attr("r", NODE_RADIUS)
 				
 					.style("fill", function(d) {
-						return get_state_colour(d.action);
+						return get_state_colour(d);
 					})
 					.on("click", function(d) {
-						// resize last circle clicked on
-						if (typeof(prev_click) != "undefined") {
-							d3.select(prev_click).attr("r", NODE_RADIUS);
-						}
-						d3.select(this).attr("r", SELECTED_NODE_RADIUS);
-			
-						// activate display box
-						document.getElementById("selected_action").style.visibility = "visible";
-			
-						// display name
-						document.getElementById("selected_action_name").innerHTML = d.action._name;
-			
-						// display state with colour
-						document.getElementById("selected_action_state").innerHTML = d.action._state;
-						document.getElementById("selected_action_state").style.color = get_state_colour(d.action);
-			
-						// display script
-						document.getElementById("selected_action_script").innerHTML = d.action.script;
 
-						// clear previous action buttons
-						var buttons = document.getElementById("action_buttons");
-						if (buttons != null) {
-							buttons.parentNode.removeChild(buttons);
-						}
-						// clear previously listed resources
-						var resources = document.getElementById("req_resources");
-						if (resources != null) {
-							resources.parentNode.removeChild(resources);
-						}
-						var resources = document.getElementById("prov_resources");
-						if (resources != null) {
-							resources.parentNode.removeChild(resources);
-						}
+						if (d.action != null) {
 
-						// display required resoures
-						var resources = document.createElement("div");
-						resources.setAttribute("id", "req_resources");
-						resources.innerHTML = "<br /> Required Resoures:";
-						document.getElementById("selected_action").appendChild(resources);
-						if (d.action.req_resource != null) {
-							if (d.action.req_resource.length >= 2) { // display list of resources
-								for (var i = 0; i < d.action.req_resource.length; i++) {
-									var resource = document.createElement("div");
-									resource.setAttribute("id", "resource"+i);
-									resource.innerHTML = d.action.req_resource[i]._name;
-									resources.appendChild(resource);
-								}
-							} else { // display only one resource
-								var resource = document.createElement("div");
-								resource.setAttribute("id", "resource");
-								resource.innerHTML = d.action.req_resource._name;
-								resources.appendChild(resource);								
+							// resize last circle clicked on
+							if (typeof(prev_click) != "undefined") {
+								//d3.select(prev_click).attr("size", NODE_RADIUS);
+								d3.select(prev_click).attr("d", d3.svg.symbol().size(NODE_SIZE));
 							}
-						}
 
-						// display provided resoures
-						var resources = document.createElement("div");
-						resources.setAttribute("id", "prov_resources");
-						resources.innerHTML = "<br /> Provided Resoures:";
-						document.getElementById("selected_action").appendChild(resources);
-						if (d.action.prov_resource != null) {
-							if (d.action.prov_resource.length >= 2) { // display list of resources
-								for (var i = 0; i < d.action.prov_resource.length; i++) {
-									var resource = document.createElement("div");
-									resource.setAttribute("id", "resource"+i);
-									resource.innerHTML = d.action.prov_resource[i]._name;
-									resources.appendChild(resource);
-								}
-							} else { // display only one resource
-								var resource = document.createElement("div");
-								resource.setAttribute("id", "resource");
-								resource.innerHTML = d.action.prov_resource._name;
-								resources.appendChild(resource);								
+							//d3.select(this).attr("size", SELECTED_NODE_RADIUS);
+							d3.select(this).attr("d", d3.svg.symbol().size(SELECTED_NODE_SIZE));
+
+							// activate display box
+							document.getElementById("selected_action").style.visibility = "visible";
+				
+							// display name
+							document.getElementById("selected_action_name").innerHTML = d.action._name;
+				
+							// display state with colour
+							document.getElementById("selected_action_state").innerHTML = d.action._state;
+							document.getElementById("selected_action_state").style.color = get_state_colour(d);
+				
+							// display script
+							document.getElementById("selected_action_script").innerHTML = d.action.script;
+
+							// clear previous action buttons
+							var buttons = document.getElementById("action_buttons");
+							if (buttons != null) {
+								buttons.parentNode.removeChild(buttons);
 							}
+							// clear previously listed resources
+							var resources = document.getElementById("req_resources");
+							if (resources != null) {
+								resources.parentNode.removeChild(resources);
+							}
+							var resources = document.getElementById("prov_resources");
+							if (resources != null) {
+								resources.parentNode.removeChild(resources);
+							}
+
+							// display required resoures
+							var resources = document.createElement("div");
+							resources.setAttribute("id", "req_resources");
+							resources.innerHTML = "<br /> Required Resoures:";
+							document.getElementById("selected_action").appendChild(resources);
+							if (d.action.req_resource != null) {
+								if (d.action.req_resource.length >= 2) { // display list of resources
+									for (var i = 0; i < d.action.req_resource.length; i++) {
+										var resource = document.createElement("div");
+										resource.setAttribute("id", "resource"+i);
+										resource.innerHTML = d.action.req_resource[i]._name;
+										resources.appendChild(resource);
+									}
+								} else { // display only one resource
+									var resource = document.createElement("div");
+									resource.setAttribute("id", "resource");
+									resource.innerHTML = d.action.req_resource._name;
+									resources.appendChild(resource);								
+								}
+							}
+
+							// display provided resoures
+							var resources = document.createElement("div");
+							resources.setAttribute("id", "prov_resources");
+							resources.innerHTML = "<br /> Provided Resoures:";
+							document.getElementById("selected_action").appendChild(resources);
+							if (d.action.prov_resource != null) {
+								if (d.action.prov_resource.length >= 2) { // display list of resources
+									for (var i = 0; i < d.action.prov_resource.length; i++) {
+										var resource = document.createElement("div");
+										resource.setAttribute("id", "resource"+i);
+										resource.innerHTML = d.action.prov_resource[i]._name;
+										resources.appendChild(resource);
+									}
+								} else { // display only one resource
+									var resource = document.createElement("div");
+									resource.setAttribute("id", "resource");
+									resource.innerHTML = d.action.prov_resource._name;
+									resources.appendChild(resource);								
+								}
+							}
+
+							// display button
+							createActionButtons(d.action);
+
+							prev_click = this;
 						}
-
-						// display button
-						createActionButtons(d.action);
-
-						prev_click = this;
 					})
 					.call(force.drag);
 
 				node.append("title")
-				  .text(function(d) { return d.action._name; });
+				  .text(function(d) { if (d.action != null) {return d.action._name;} else {return "DECISION"} });
 
 				
 
@@ -634,7 +566,9 @@ Actions:
 		.on("click", function() {
 			// resize last circle clicked on
 			if (typeof(prev_click) != "undefined") {
-				d3.select(prev_click).attr("r", NODE_RADIUS);
+				//d3.select(prev_click).attr("size", NODE_RADIUS);
+				d3.select(prev_click).attr("d", d3.svg.symbol().size(NODE_SIZE));
+				
 				prev_click = null;
 			}
 			
