@@ -148,6 +148,7 @@ Actions:
 	var process_data;
 	var prev_click;
 
+	var actions = [];
 	var links = [];
 
 	function get_state_colour(d) {
@@ -164,7 +165,7 @@ Actions:
 				return "grey";
 			}
 		} else if (d.decision != null) {
-			return "grey";
+			return "black";
 		}
 
 		return "black";
@@ -196,94 +197,160 @@ Actions:
 	    document.getElementById("selected_action").appendChild(button_div);
 	}
 
-	function parseActions(process_data) {
+	function addLinks(links, new_links, offset) {
+		for (var i = 0; i < new_links.length; i++) {
+			var link = {};
+			if (new_links[i].source === undefined) {
+				alert('found it!');
+			}
+			link.source = new_links[i].source + offset;
+			link.target = new_links[i].target + offset;
+			links.push(link);	
+		}
+	}
+
+	function selection(process_data, actions, links) {
 		if (process_data == null) {
 			return [];
 		}
 
-		var acts = [];
-		var more_acts;
+		// add decision node to start of selection
+		var node = {};
+		node.decision = {};
+		actions.push(node);
+		var decision_node = actions.length-1;
+		var last_selection_nodes = [];
+		
+
+		// add link to decision node
+		if (link_stack.length >= 1) {
+			var link = {};
+			link.source = link_stack.pop();
+			link.target = decision_node;
+			links.push(link);
+		}
 
   		var x = process_data.childNodes;
-
-  		var link_stack = [];
+  		
 		for (var i = 0; i < x.length; i++) {
 			if (x[i].nodeName === "action") {
 				
 				var xml_string = new XMLSerializer().serializeToString(x[i]);
 				var action = x2js.xml_str2json(xml_string);
-				acts.push(action);
+				// actions.push(action);
+				
+				// if (link_stack.length >= 1) {
+				// 	var link = {};
+				// 	link.source = decision_node;					
+				// 	link.target = actions.length-1;
+				// 	links.push(link);
+				// }
+
+				// last_selection_nodes.push(actions.length-1);
+
+			} else if (x[i].nodeName === "sequence") {
+
+				var sequence_nodes = [];
+				var sequence_links = [];
+
+				// add link from decision node to current sequence
+				link_stack.push(decision_node-actions.length);
+
+				parseActions(x[i], sequence_nodes, sequence_links);
+
+
+				if (sequence_nodes.length >= 1) {
+					//alert(JSON.stringify(sequence_nodes));
+					addLinks(links, sequence_links, actions.length);
+					actions.push.apply(actions, sequence_nodes);
+
+					last_selection_nodes.push(actions.length-1);
+				}
+			}
+		}
+
+		// add node to end of selection
+		var node = {};
+		node.marker = {};
+		actions.push(node);
+		var selection_end_node = actions.length-1;
+
+		// add links to node at end of selection
+		for (var j = 0; j < last_selection_nodes.length; j++) {
+			var link = {};
+			link.source = last_selection_nodes[j];
+			link.target = selection_end_node;
+			links.push(link);
+		}
+
+		link_stack.push(selection_end_node);
+	}
+
+	var link_stack = [];
+	function parseActions(process_data, actions, links) {
+		if (process_data == null) {
+			return [];
+		}
+
+  		var x = process_data.childNodes;
+  		
+		for (var i = 0; i < x.length; i++) {
+			if (x[i].nodeName === "action") {
+				
+				var xml_string = new XMLSerializer().serializeToString(x[i]);
+				var action = x2js.xml_str2json(xml_string);
+				actions.push(action);
 				
 				if (link_stack.length >= 1) {
 					var link = {};
 					link.source = link_stack.pop();					
-					link.target = acts.length-1;
+					link.target = actions.length-1;
 					links.push(link);
 				}
 
-				link_stack.push(acts.length-1);
+				link_stack.push(actions.length-1);
 
 			} else if (x[i].nodeName === "branch") {
 
 			} else if (x[i].nodeName === "selection") {
 
+				selection(x[i], actions, links);
+				//link_stack.push(actions.length-1);
+
 			} else if (x[i].nodeName === "iteration") {
 
-				var iteration_start = acts.length;
+				var iteration_start = actions.length;
 
 				// retrieve actions from within iteration
-				var more_acts = parseActions(x[i]);
-
-				// add link to start of iteration
-				if (link_stack.length >= 1) {
-					var link = {};
-					link.source = link_stack.pop();					
-					link.target = acts.length-1;
-					links.push(link);
-				}
-				acts.push.apply(acts, more_acts);
-				link_stack.push(acts.length-1);
+				parseActions(x[i], actions, links);
 
 				// add decision node to end of iteration
-				var act = {};
-				act.decision = {};
-				acts.push(act);
+				var node = {};
+				node.decision = {};
+				actions.push(node);
 
 				// add link to decision node from end of iteration
 				if (link_stack.length >= 1) {
 					var link = {};
 					link.source = link_stack.pop();
-					link.target = acts.length-1;
+					link.target = actions.length-1;
 					links.push(link);
 				}
 
 				// add link back to start of iteration
 				var link = {};
+				link.source = actions.length-1;
 				link.target = iteration_start;
-				link.source = acts.length-1;
 				links.push(link);
 
-
-				link_stack.push(acts.length-1);
+				link_stack.push(actions.length-1);
 
 			} else if (x[i].nodeName === "sequence") {
 
-				var more_acts = parseActions(x[i]);
-				acts.push.apply(acts, more_acts);
-
-				if (link_stack.length >= 1) {
-					var link = {};
-					link.source = link_stack.pop();					
-					link.target = acts.length-1;
-					links.push(link);
-				}
-
-				link_stack.push(acts.length-1);
-
+				parseActions(x[i], actions, links);
 			}
 		}
 
-		return acts;
 	}
 
 	var listed_as = "";
@@ -291,10 +358,10 @@ Actions:
 
 		var Arr = actions.slice(0);
 		if (listed_as === "name_a2z") {
-			Arr.sort(function(a, b){ return a.action === undefined ? -1 : b.action === undefined ? 1 : a.action._name.localeCompare(b.action._name); });
+			Arr.sort(function(a, b){ return a.action === undefined ? 1 : b.action === undefined ? -1 : b.action._name.localeCompare(a.action._name); });
 			listed_as = "name_z2a";
 		} else if (listed_as === "name_z2a" ) {
-			Arr.sort(function(a, b){ return a.action === undefined ? 1 : b.action === undefined ? -1 : b.action._name.localeCompare(a.action._name); });
+			Arr.sort(function(a, b){ return a.action === undefined ? -1 : b.action === undefined ? 1 : a.action._name.localeCompare(b.action._name); });
 			listed_as = "name_a2z";
 		} else { // default
 			Arr.sort(function(a, b){ return a.action === undefined ? -1 : b.action === undefined ? 1 : a.action._name.localeCompare(b.action._name); });
@@ -308,10 +375,10 @@ Actions:
 		
 		var Arr = actions.slice(0);
 		if (listed_as === "state_a2z") {
-			Arr.sort(function(a, b){ return a.action === undefined ? -1 : b.action === undefined ? 1 : a.action._state.localeCompare(b.action._state); });
+			Arr.sort(function(a, b){ return a.action === undefined ? 1 : b.action === undefined ? -1 : b.action._state.localeCompare(a.action._state); });
 			listed_as = "state_z2a";
 		} else if (listed_as === "state_z2a" ) {
-			Arr.sort(function(a, b){ return a.action === undefined ? 1 : b.action === undefined ? -1 : b.action._state.localeCompare(a.action._state); });
+			Arr.sort(function(a, b){ return a.action === undefined ? -1 : b.action === undefined ? 1 : a.action._state.localeCompare(b.action._state); });
 			listed_as = "state_a2z";
 		} else { // default
 			Arr.sort(function(a, b){ return a.action === undefined ? -1 : b.action === undefined ? 1 : a.action._state.localeCompare(b.action._state); });
@@ -382,7 +449,9 @@ Actions:
 					process_data = proc_table.process_table.process;
 				}
 
-				actions = parseActions(proc_data);
+				actions = [];
+				links = [];
+				parseActions(proc_data, actions, links);
 				//alert(JSON.stringify(actions));
 
 				listActionsInTable(actions);
@@ -403,8 +472,8 @@ Actions:
 
 				force
 					.gravity(0)
-					.linkStrength(0.5)
-					.linkDistance(100)
+					//.linkDistance(2.5)
+					//.linkStrength(0.25)
 					.nodes(actions)
 					.links(links)
 					.start();
@@ -421,7 +490,7 @@ Actions:
 					.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
 					.attr("d", d3.svg.symbol()
 				        .size(function(d) { return NODE_SIZE;})
-				        .type(function(d) { if (d.action !=null ) {return "circle";} else {return "diamond";} }))
+				        .type(function(d) { if (d.action !=null) {return "circle";} else if (d.decision !=null) {return "diamond";} else {return "square";}}))
 					//.enter().append("circle")
 					.attr("class", "node")
 					//.attr("r", NODE_RADIUS)
@@ -521,7 +590,11 @@ Actions:
 					.call(force.drag);
 
 				node.append("title")
-				  .text(function(d) { if (d.action != null) {return d.action._name;} else {return "DECISION"} });
+				  .text(function(d) {
+				  	if (d.action != null) {return d.action._name;}
+				  	else if (d.decision != null) {return "DECISION";}
+				  	else {return "MARKER";}
+				  });
 
 				
 
