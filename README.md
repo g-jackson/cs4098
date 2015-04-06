@@ -2,7 +2,7 @@
 ##Group Project ~Kawaii~
 A project for CS4098 to demonstrate the use of the peos system with pml in a medical record system openEMR
 
-## Project Intallation
+## Project Installation
 
 To install the project the following steps must be taken. Further detail on each step is below.
 * Downlading this repository 
@@ -52,6 +52,7 @@ Full Listing of libraries on Ubuntu(14.04):  `sudo apt-get install apache2-mpm-p
 * ` chown www-data openemr`
 * Browse to http://localhost.com/openemr
 * Follow the instructions given 
+* When the installation is finished, OpenEMR should direct you to the login page. If you are instead directed to the start of the setup again, you have to manually change the config file openemr/sites/default/sqlconf.php and on line 27 set $config to equal 1 instead of 0.
 * For more info go to [Openemr Installation Instructions](http://www.open-emr.org/wiki/index.php/OpenEMR_4.2.0_Linux_Installation)
 
 ## Testing Subsystems
