@@ -209,6 +209,78 @@ Actions:
 		}
 	}
 
+	function branch(process_data, actions, links) {
+		if (process_data == null) {
+			return [];
+		}
+
+		var last_selection_nodes = [];
+		// add decision node to start of selection
+		var branch_start_node;
+		if (link_stack.length >= 1) {
+			branch_start_node = link_stack.pop();
+		} else {
+			alert("this shouldn't happen.. I think");
+			return;
+		}
+
+  		var x = process_data.childNodes;
+  		
+		for (var i = 0; i < x.length; i++) {
+			if (x[i].nodeName === "action") {
+				
+				var xml_string = new XMLSerializer().serializeToString(x[i]);
+				var action = x2js.xml_str2json(xml_string);
+				// actions.push(action);
+				
+				// if (link_stack.length >= 1) {
+				// 	var link = {};
+				// 	link.source = branch_start_node;					
+				// 	link.target = actions.length-1;
+				// 	links.push(link);
+				// }
+
+				// last_selection_nodes.push(actions.length-1);
+
+			} else if (x[i].nodeName === "sequence") {
+
+				var sequence_nodes = [];
+				var sequence_links = [];
+
+				// add link from decision node to current sequence
+				link_stack.push(branch_start_node-actions.length);
+
+				parseActions(x[i], sequence_nodes, sequence_links);
+
+
+				if (sequence_nodes.length >= 1) {
+					//alert(JSON.stringify(sequence_nodes));
+					addLinks(links, sequence_links, actions.length);
+					actions.push.apply(actions, sequence_nodes);
+
+					last_selection_nodes.push(actions.length-1);
+				}
+			}
+		}
+
+		// add node to end of branch
+		var node = {};
+		node.marker = {};
+		node.marker.name = "END_BRANCH_MARKER";
+		actions.push(node);
+		var selection_end_node = actions.length-1;
+
+		// add links to node at end of branch
+		for (var j = 0; j < last_selection_nodes.length; j++) {
+			var link = {};
+			link.source = last_selection_nodes[j];
+			link.target = selection_end_node;
+			links.push(link);
+		}
+
+		link_stack.push(selection_end_node);
+	}
+
 	function selection(process_data, actions, links) {
 		if (process_data == null) {
 			return [];
@@ -272,6 +344,7 @@ Actions:
 		// add node to end of selection
 		var node = {};
 		node.marker = {};
+		node.marker.name = "END_SELECTION_MARKER";
 		actions.push(node);
 		var selection_end_node = actions.length-1;
 
@@ -312,10 +385,11 @@ Actions:
 
 			} else if (x[i].nodeName === "branch") {
 
+				branch(x[i], actions, links);
+
 			} else if (x[i].nodeName === "selection") {
 
 				selection(x[i], actions, links);
-				//link_stack.push(actions.length-1);
 
 			} else if (x[i].nodeName === "iteration") {
 
@@ -593,7 +667,8 @@ Actions:
 				  .text(function(d) {
 				  	if (d.action != null) {return d.action._name;}
 				  	else if (d.decision != null) {return "DECISION";}
-				  	else {return "MARKER";}
+				  	else if (d.marker != null) {return d.marker.name;}
+				  	else {return "";}
 				  });
 
 				
