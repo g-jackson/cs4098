@@ -91,9 +91,11 @@ echo $retour;
 	file = (data[0]+".dat.xml");
 	file = file.replace(/\s/g, '');
 	proc = data[1];
-	document.write("<br>pid = " + data[0]);
-	document.write("<br>file = " + file);
-	document.write("<br>process = " + proc);
+	
+	// document.write("<br>pid = " + data[0]);
+	// document.write("<br>file = " + file);
+	// document.write("<br>process = " + proc);
+
 </script>
 
 <br/>
@@ -545,9 +547,6 @@ Actions:
 				}
 
 				force
-					.gravity(0)
-					//.linkDistance(2.5)
-					//.linkStrength(0.25)
 					.nodes(actions)
 					.links(links)
 					.start();
@@ -572,7 +571,7 @@ Actions:
 					.style("fill", function(d) {
 						return get_state_colour(d);
 					})
-					.on("click", function(d) {
+					.on("dblclick", function(d) {
 
 						if (d.action != null) {
 
@@ -675,15 +674,22 @@ Actions:
 
 				force.on("tick", function() {
 					svg.selectAll("path")
-      					.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+      					.attr("transform", function(d) { 
+      						if (d.x < 0) d.x = 0;
+      						if (d.x > width) d.x = width;
+      						if (d.y < 0) d.y = 0;
+      						if (d.y > height) d.y = height;
+      						return "translate(" + d.x + "," + d.y + ")"; 
+      					});
+
+					node.attr("cx", function(d) { return d.x; })
+						.attr("cy", function(d) { return d.y; });
 
 					link.attr("x1", function(d) { return d.source.x; })
 						.attr("y1", function(d) { return d.source.y; })
 						.attr("x2", function(d) { return d.target.x; })
 						.attr("y2", function(d) { return d.target.y; });
 
-					node.attr("cx", function(d) { return d.x; })
-						.attr("cy", function(d) { return d.y; });
 				});
 
 			}
@@ -696,20 +702,30 @@ Actions:
 	
 
 	var force = d3.layout.force()
-		
+		.gravity(0)
+		.linkDistance(0.01)
+		.linkStrength(1.0)		
 		.size([width, height]);
 
 	var svg = d3.select("#pathview").append("svg")
 		.attr("width", width)
-		.attr("height", height);
+		.attr("height", height)
+		.append("g")
+			.call(zm =d3.behavior.zoom().scaleExtent([1,3]).on("zoom", redraw)).on("dblclick.zoom", null);
+			//.call(drag);
+
 
 	var drag = force.drag()
-		.on("dragstart", dragstart); 
+		.origin(function(d) { return d; })
+		.on("dragstart", dragstart)
+		.on("drag", drag)
+		.on("dragend", dragend);
+
 
 	// draw grey background
-	svg.append("rect")
-		.attr("width", "100%")
-		.attr("height", "100%")
+	var rect = svg.append("rect")
+		.attr("width", width)
+		.attr("height", height)
 		.attr("fill", "lightgrey")
 		.on("click", function() {
 			// resize last circle clicked on
@@ -733,9 +749,50 @@ Actions:
 		});
 
 	function dragstart(d) {
+		d3.event.sourceEvent.stopPropagation();
+   		d3.select(this).classed("dragging", true);
 		d3.select(this).classed("fixed", d.fixed = true);
 	} 
+
+	function drag(d) {
+		d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
+	}
+
+	function dragend(d) {
+		d3.select(this).classed("dragging", false);
+	}
 	
+	var zoom = d3.behavior.zoom().on("zoom",function(){
+  var t = d3.event.translate;
+  var s = d3.event.scale;
+  svg.selectAll("rect").attr("transform","translate("+t[0]+","+t[1]+") scale("+s+")")  
+}).scaleExtent([1,10]);
+
+	function redraw() {
+		//node.attr("font-size", (nodeFontSize / d3.event.scale) + "px");
+		//svg.selectAll("path").attr("d", d3.svg.symbol().size(function(d) { return NODE_SIZE/d3.event.scale; }));
+
+		// var tx = d3.event.translate[0];
+		// var ty = d3.event.translate[1];
+
+		// console.log(svg.node().getBoundingClientRect());
+
+		// var svg_width = svg.node().getBoundingClientRect().width;
+		// var svg_height = svg.node().getBoundingClientRect().height;
+
+		// if (tx > 0) tx = 0;
+		// if (tx+width < svg_width) tx = svg_width-width;
+		// if (ty > 0) ty = 0;
+		// if (ty+height < svg_height) ty = svg_height-height;
+
+		// d3.event.translate = [tx, ty];
+
+		svg.attr("transform",
+			"translate(" + d3.event.translate + ")"
+			+ " scale(" + d3.event.scale + ")");
+
+	}
+
 	</script>
 
 	<svg id="something_important_for_arrows">
