@@ -82,3 +82,9 @@ If you are interested in using only some of the subsystems in this project witho
 * `chown www-data pathway`
 * Opening http://localhost/pathway/patient_table.php will display a listing of all the pathways present
 * From here you can add and view pathways
+
+#### Tests
+* Dependancies: python2.7
+
+To run http tests:
+    python test/httptest.py
