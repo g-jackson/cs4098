@@ -58,12 +58,14 @@ Full Listing of libraries on Ubuntu(14.04):  `sudo apt-get install apache2-mpm-p
 ### Features
 Below we will describe each feature on our backlog and how to use it.
 ##### Real EMR interface
+Our pathway system integrates directly into OpenEMR which is a real EMR interface. We describe how to install and access OpenEMR in the OpenEMR Installation section above.
 ##### XML parsing
 ##### Task list
 ##### Basic pathway graph view
 ##### Pan and zoom
 ##### Kernel interface
 ##### Resource access
+We currently do not support this feature.
 ##### Refined graph view
 
 ### Testing Subsystems
