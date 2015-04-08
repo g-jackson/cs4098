@@ -69,7 +69,6 @@ marker#arrow {
 
 <body>
 
-
 <!-- get pid for passing to js -->
 <div id="dom-target" style="display: none;">
 <?php 
@@ -79,6 +78,12 @@ marker#arrow {
 ?>
 </div>
 
+<?php 
+$retour .= "<a href='../pathways.php?pid=".$pid."'>Back to Patient Pathway List</a>";
+echo $retour;
+?>
+<br/>
+
 <script>
 	var div = document.getElementById("dom-target");
 	var data = div.textContent;
@@ -86,9 +91,11 @@ marker#arrow {
 	file = (data[0]+".dat.xml");
 	file = file.replace(/\s/g, '');
 	proc = data[1];
-	document.write("<br>pid = " + data[0]);
-	document.write("<br>file = " + file);
-	document.write("<br>process = " + proc);
+	
+	// document.write("<br>pid = " + data[0]);
+	// document.write("<br>file = " + file);
+	// document.write("<br>process = " + proc);
+
 </script>
 
 <br/>
@@ -137,23 +144,33 @@ Actions:
 	var NODE_RADIUS = 8;
 	var SELECTED_NODE_RADIUS = 12;
 
+	var NODE_SIZE = 200;
+	var SELECTED_NODE_SIZE = 400;
+
 	var process_data;
 	var prev_click;
 
+	var actions = [];
 	var links = [];
 
 	function get_state_colour(d) {
-		if (d._state == "BLOCKED") {
-			return "red";
-		} else if (d._state == "AVAILABLE") {
-			return "orange";
-		} else if (d._state == "READY") {
-			return "yellow";							
-		} else if (d._state == "COMPLETE") {
-			return "green";
-		} else {
-			return "grey";
+		if (d.action != null) {
+			if (d.action._state == "BLOCKED") {
+				return "red";
+			} else if (d.action._state == "AVAILABLE") {
+				return "orange";
+			} else if (d.action._state == "READY") {
+				return "yellow";							
+			} else if (d.action._state == "COMPLETE") {
+				return "green";
+			} else {
+				return "grey";
+			}
+		} else if (d.decision != null) {
+			return "black";
 		}
+
+		return "black";
 	}
 
 	function createActionButtons(d) {
@@ -182,22 +199,232 @@ Actions:
 	    document.getElementById("selected_action").appendChild(button_div);
 	}
 
-	var actions = [];
-	function parseActions(process_data) {
+	function addLinks(links, new_links, offset) {
+		for (var i = 0; i < new_links.length; i++) {
+			var link = {};
+			if (new_links[i].source === undefined) {
+				alert('found it!');
+			}
+			link.source = new_links[i].source + offset;
+			link.target = new_links[i].target + offset;
+			links.push(link);	
+		}
+	}
+
+	function branch(process_data, actions, links) {
 		if (process_data == null) {
+			return [];
+		}
+
+		var last_selection_nodes = [];
+		// add decision node to start of selection
+		var branch_start_node;
+		if (link_stack.length >= 1) {
+			branch_start_node = link_stack.pop();
+		} else {
+			alert("this shouldn't happen.. I think");
 			return;
 		}
 
-		parseActions(process_data.iteration);
+  		var x = process_data.childNodes;
+  		
+		for (var i = 0; i < x.length; i++) {
+			if (x[i].nodeName === "action") {
+				
+				var xml_string = new XMLSerializer().serializeToString(x[i]);
+				var action = x2js.xml_str2json(xml_string);
+				// actions.push(action);
+				
+				// if (link_stack.length >= 1) {
+				// 	var link = {};
+				// 	link.source = branch_start_node;					
+				// 	link.target = actions.length-1;
+				// 	links.push(link);
+				// }
 
-		if (process_data.action == null) { // no actions
-			// nothing to link
-		} else if (process_data.action.length >= 2) { // list of actions
-			for (var i = 0; i < process_data.action.length; i++) {
-				actions.push(process_data.action[i]);
+				// last_selection_nodes.push(actions.length-1);
+
+			} else if (x[i].nodeName === "sequence") {
+
+				var sequence_nodes = [];
+				var sequence_links = [];
+
+				// add link from decision node to current sequence
+				link_stack.push(branch_start_node-actions.length);
+
+				parseActions(x[i], sequence_nodes, sequence_links);
+
+
+				if (sequence_nodes.length >= 1) {
+					//alert(JSON.stringify(sequence_nodes));
+					addLinks(links, sequence_links, actions.length);
+					actions.push.apply(actions, sequence_nodes);
+
+					last_selection_nodes.push(actions.length-1);
+				}
 			}
-		} else { // only one action
-			actions.push(process_data.action);
+		}
+
+		// add node to end of branch
+		var node = {};
+		node.marker = {};
+		node.marker.name = "END_BRANCH_MARKER";
+		actions.push(node);
+		var selection_end_node = actions.length-1;
+
+		// add links to node at end of branch
+		for (var j = 0; j < last_selection_nodes.length; j++) {
+			var link = {};
+			link.source = last_selection_nodes[j];
+			link.target = selection_end_node;
+			links.push(link);
+		}
+
+		link_stack.push(selection_end_node);
+	}
+
+	function selection(process_data, actions, links) {
+		if (process_data == null) {
+			return [];
+		}
+
+		// add decision node to start of selection
+		var node = {};
+		node.decision = {};
+		actions.push(node);
+		var decision_node = actions.length-1;
+		var last_selection_nodes = [];
+		
+
+		// add link to decision node
+		if (link_stack.length >= 1) {
+			var link = {};
+			link.source = link_stack.pop();
+			link.target = decision_node;
+			links.push(link);
+		}
+
+  		var x = process_data.childNodes;
+  		
+		for (var i = 0; i < x.length; i++) {
+			if (x[i].nodeName === "action") {
+				
+				var xml_string = new XMLSerializer().serializeToString(x[i]);
+				var action = x2js.xml_str2json(xml_string);
+				// actions.push(action);
+				
+				// if (link_stack.length >= 1) {
+				// 	var link = {};
+				// 	link.source = decision_node;					
+				// 	link.target = actions.length-1;
+				// 	links.push(link);
+				// }
+
+				// last_selection_nodes.push(actions.length-1);
+
+			} else if (x[i].nodeName === "sequence") {
+
+				var sequence_nodes = [];
+				var sequence_links = [];
+
+				// add link from decision node to current sequence
+				link_stack.push(decision_node-actions.length);
+
+				parseActions(x[i], sequence_nodes, sequence_links);
+
+
+				if (sequence_nodes.length >= 1) {
+					//alert(JSON.stringify(sequence_nodes));
+					addLinks(links, sequence_links, actions.length);
+					actions.push.apply(actions, sequence_nodes);
+
+					last_selection_nodes.push(actions.length-1);
+				}
+			}
+		}
+
+		// add node to end of selection
+		var node = {};
+		node.marker = {};
+		node.marker.name = "END_SELECTION_MARKER";
+		actions.push(node);
+		var selection_end_node = actions.length-1;
+
+		// add links to node at end of selection
+		for (var j = 0; j < last_selection_nodes.length; j++) {
+			var link = {};
+			link.source = last_selection_nodes[j];
+			link.target = selection_end_node;
+			links.push(link);
+		}
+
+		link_stack.push(selection_end_node);
+	}
+
+	var link_stack = [];
+	function parseActions(process_data, actions, links) {
+		if (process_data == null) {
+			return [];
+		}
+
+  		var x = process_data.childNodes;
+  		
+		for (var i = 0; i < x.length; i++) {
+			if (x[i].nodeName === "action") {
+				
+				var xml_string = new XMLSerializer().serializeToString(x[i]);
+				var action = x2js.xml_str2json(xml_string);
+				actions.push(action);
+				
+				if (link_stack.length >= 1) {
+					var link = {};
+					link.source = link_stack.pop();					
+					link.target = actions.length-1;
+					links.push(link);
+				}
+
+				link_stack.push(actions.length-1);
+
+			} else if (x[i].nodeName === "branch") {
+
+				branch(x[i], actions, links);
+
+			} else if (x[i].nodeName === "selection") {
+
+				selection(x[i], actions, links);
+
+			} else if (x[i].nodeName === "iteration") {
+
+				var iteration_start = actions.length;
+
+				// retrieve actions from within iteration
+				parseActions(x[i], actions, links);
+
+				// add decision node to end of iteration
+				var node = {};
+				node.decision = {};
+				actions.push(node);
+
+				// add link to decision node from end of iteration
+				if (link_stack.length >= 1) {
+					var link = {};
+					link.source = link_stack.pop();
+					link.target = actions.length-1;
+					links.push(link);
+				}
+
+				// add link back to start of iteration
+				var link = {};
+				link.source = actions.length-1;
+				link.target = iteration_start;
+				links.push(link);
+
+				link_stack.push(actions.length-1);
+
+			} else if (x[i].nodeName === "sequence") {
+
+				parseActions(x[i], actions, links);
+			}
 		}
 
 	}
@@ -207,13 +434,13 @@ Actions:
 
 		var Arr = actions.slice(0);
 		if (listed_as === "name_a2z") {
-			Arr.sort(function(a, b){return b._name.localeCompare(a._name)});
+			Arr.sort(function(a, b){ return a.action === undefined ? 1 : b.action === undefined ? -1 : b.action._name.localeCompare(a.action._name); });
 			listed_as = "name_z2a";
 		} else if (listed_as === "name_z2a" ) {
-			Arr.sort(function(a, b){return a._name.localeCompare(b._name)});
+			Arr.sort(function(a, b){ return a.action === undefined ? -1 : b.action === undefined ? 1 : a.action._name.localeCompare(b.action._name); });
 			listed_as = "name_a2z";
 		} else { // default
-			Arr.sort(function(a, b){return a._name.localeCompare(b._name)});	
+			Arr.sort(function(a, b){ return a.action === undefined ? -1 : b.action === undefined ? 1 : a.action._name.localeCompare(b.action._name); });
 			listed_as = "name_a2z";
 		}
 
@@ -224,13 +451,13 @@ Actions:
 		
 		var Arr = actions.slice(0);
 		if (listed_as === "state_a2z") {
-			Arr.sort(function(a, b){return b._state.localeCompare(a._state)});
+			Arr.sort(function(a, b){ return a.action === undefined ? 1 : b.action === undefined ? -1 : b.action._state.localeCompare(a.action._state); });
 			listed_as = "state_z2a";
 		} else if (listed_as === "state_z2a" ) {
-			Arr.sort(function(a, b){return a._state.localeCompare(b._state)});
+			Arr.sort(function(a, b){ return a.action === undefined ? -1 : b.action === undefined ? 1 : a.action._state.localeCompare(b.action._state); });
 			listed_as = "state_a2z";
 		} else { // default
-			Arr.sort(function(a, b){return a._state.localeCompare(b._state)});
+			Arr.sort(function(a, b){ return a.action === undefined ? -1 : b.action === undefined ? 1 : a.action._state.localeCompare(b.action._state); });
 			listed_as = "state_a2z";
 		}
 
@@ -245,103 +472,22 @@ Actions:
 		var tbody = document.createElement('tbody');
 		tbody.setAttribute("id", "action_list_table_body");
 
-		var tr, td;
-		if (actions.length >= 2) { // list of actions
-
-			for (var i = 0; i < actions.length; i++) {
+		for (var i = 0; i < actions.length; i++) {
+			if (actions[i].action != null) {
 				tr = document.createElement('tr');
 				td = document.createElement('td');
-				td.appendChild(document.createTextNode(actions[i]._name))
+				td.appendChild(document.createTextNode(actions[i].action._name))
 				tr.appendChild(td)
 				td = document.createElement('td');
-				td.appendChild(document.createTextNode(actions[i]._state))
+				td.appendChild(document.createTextNode(actions[i].action._state))
 				td.style.color = get_state_colour(actions[i]);
 				tr.appendChild(td)
 				tbody.appendChild(tr);
 			}
-
-		} else { // only one action
-
-			tr = document.createElement('tr');
-			td = document.createElement('td');
-			td.appendChild(document.createTextNode(actions._name))
-			tr.appendChild(td)
-			td = document.createElement('td');
-			td.appendChild(document.createTextNode(actions._state))
-			td.style.color = get_state_colour(actions);
-			tr.appendChild(td)
-			tbody.appendChild(tr);
 		}
 
 		var old_tbody = document.getElementById("action_list_table_body");
 		old_tbody.parentNode.replaceChild(tbody, old_tbody)
-	}
-
-	function creatLinkForReqResource(process_data, req_resource_name, req_resource_action_index) {
-		
-
-		// for each action
-		for (var act_j = 0; act_j < process_data.action.length; act_j++) {
-
-			// search through required provided resources
-			if (process_data.action[act_j].prov_resource == null) { // no provided resources
-				// nothing to link
-			} else if (process_data.action[act_j].prov_resource.length >= 2) { // list of resources
-
-				// and link them to actions providing that resource
-				for (var res_i = 0; res_i < process_data.action[act_j].prov_resource.length; res_i++) {
-					var resource_name = process_data.action[act_j].prov_resource[res_i]._name;
-					if (req_resource_name === resource_name) {
-						var link = {};
-						link.source = act_j;
-						link.target = req_resource_action_index;
-						links.push(link);
-					}
-				}
-
-			} else { // only one resource
-				var resource_name = process_data.action[act_j].prov_resource._name;
-				if (req_resource_name === resource_name) {
-					var link = {};
-					link.source = act_j;
-					link.target = req_resource_action_index;
-					links.push(link);
-				}
-			}
-			
-		}
-	}
-
-	function generateLinks(process_data) {
-		// nothing to link if only one action or less
-		if (process_data.action === null) {
-			return;
-		} 
-
-		if (process_data.action.length >= 2) {
-			
-			// for each action
-			for (var act_i = 0; act_i < process_data.action.length; act_i++) {
-
-				// search through required required resources
-				if (process_data.action[act_i].req_resource == null) { // no required resources
-					// nothing to link
-				} else if (process_data.action[act_i].req_resource.length >= 2) { // list of resources
-
-					// and link them to actions providing that resource
-					for (var res_i = 0; res_i < process_data.action[act_i].req_resource.length; res_i++) {
-						var resource_name = process_data.action[act_i].req_resource[res_i]._name;
-						creatLinkForReqResource(process_data, resource_name, act_i);
-					}
-
-				} else { // only one resource
-					var resource_name = process_data.action[act_i].req_resource._name;
-					creatLinkForReqResource(process_data, resource_name, act_i);
-				}
-				
-			}
-
-		}
 	}
 
 
@@ -356,6 +502,19 @@ Actions:
 		xmlhttp.onreadystatechange=function(){
 			if (xmlhttp.readyState==4 && xmlhttp.status==200) {
 
+				var xmlData=xmlhttp.responseXML.documentElement;
+				
+				var x = xmlData.getElementsByTagName("process");
+				//alert(x.length);				
+
+				var proc_data;
+				for (i = 0; i < x.length; i++){
+					if (x[i].getAttribute("pid") === id) {
+						proc_data = x[i];
+					}
+				}
+				//alert(proc_data.getAttribute("model"));					
+
 				var xml_string = new XMLSerializer().serializeToString(xmlhttp.responseXML.documentElement);
 				var proc_table = x2js.xml_str2json(xml_string);
 
@@ -366,12 +525,10 @@ Actions:
 					process_data = proc_table.process_table.process;
 				}
 
-				//alert(JSON.stringify(process_data[0]));
-				parseActions(process_data);
+				actions = [];
+				links = [];
+				parseActions(proc_data, actions, links);
 				//alert(JSON.stringify(actions));
-				
-				generateLinks(process_data);
-				// alert(JSON.stringify(links));
 
 				listActionsInTable(actions);
 
@@ -390,10 +547,6 @@ Actions:
 				}
 
 				force
-					.gravity(0)
-					.charge(15)
-					.linkStrength(0.1)
-					.chargeDistance(5)
 					.nodes(actions)
 					.links(links)
 					.start();
@@ -404,112 +557,139 @@ Actions:
 					.attr("class", "link")
 					.attr("marker-end", "url(#arrow)");
 
-				var node = svg.selectAll(".node")
+				var node = svg.selectAll("path")
 					.data(actions)
-					.enter().append("circle")
+					.enter().append("path")
+					.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+					.attr("d", d3.svg.symbol()
+				        .size(function(d) { return NODE_SIZE;})
+				        .type(function(d) { if (d.action !=null) {return "circle";} else if (d.decision !=null) {return "diamond";} else {return "square";}}))
+					//.enter().append("circle")
 					.attr("class", "node")
-					.attr("r", NODE_RADIUS)
+					//.attr("r", NODE_RADIUS)
 				
 					.style("fill", function(d) {
 						return get_state_colour(d);
 					})
-					.on("click", function(d) {
-						// resize last circle clicked on
-						if (typeof(prev_click) != "undefined") {
-							d3.select(prev_click).attr("r", NODE_RADIUS);
-						}
-						d3.select(this).attr("r", SELECTED_NODE_RADIUS);
-			
-						// activate display box
-						document.getElementById("selected_action").style.visibility = "visible";
-			
-						// display name
-						document.getElementById("selected_action_name").innerHTML = d._name;
-			
-						// display state with colour
-						document.getElementById("selected_action_state").innerHTML = d._state;
-						document.getElementById("selected_action_state").style.color = get_state_colour(d);
-			
-						// display script
-						document.getElementById("selected_action_script").innerHTML = d.script;
+					.on("dblclick", function(d) {
 
-						// clear previous action buttons
-						var buttons = document.getElementById("action_buttons");
-						if (buttons != null) {
-							buttons.parentNode.removeChild(buttons);
-						}
-						// clear previously listed resources
-						var resources = document.getElementById("req_resources");
-						if (resources != null) {
-							resources.parentNode.removeChild(resources);
-						}
-						var resources = document.getElementById("prov_resources");
-						if (resources != null) {
-							resources.parentNode.removeChild(resources);
-						}
+						if (d.action != null) {
 
-						// display required resoures
-						var resources = document.createElement("div");
-						resources.setAttribute("id", "req_resources");
-						resources.innerHTML = "<br /> Required Resoures:";
-						document.getElementById("selected_action").appendChild(resources);
-						if (d.req_resource != null) {
-							if (d.req_resource.length >= 2) { // display list of resources
-								for (var i = 0; i < d.req_resource.length; i++) {
-									var resource = document.createElement("div");
-									resource.setAttribute("id", "resource"+i);
-									resource.innerHTML = d.req_resource[i]._name;
-									resources.appendChild(resource);
-								}
-							} else { // display only one resource
-								var resource = document.createElement("div");
-								resource.setAttribute("id", "resource");
-								resource.innerHTML = d.req_resource._name;
-								resources.appendChild(resource);								
+							// resize last circle clicked on
+							if (typeof(prev_click) != "undefined") {
+								//d3.select(prev_click).attr("size", NODE_RADIUS);
+								d3.select(prev_click).attr("d", d3.svg.symbol().size(NODE_SIZE));
 							}
-						}
 
-						// display provided resoures
-						var resources = document.createElement("div");
-						resources.setAttribute("id", "prov_resources");
-						resources.innerHTML = "<br /> Provided Resoures:";
-						document.getElementById("selected_action").appendChild(resources);
-						if (d.prov_resource != null) {
-							if (d.prov_resource.length >= 2) { // display list of resources
-								for (var i = 0; i < d.prov_resource.length; i++) {
-									var resource = document.createElement("div");
-									resource.setAttribute("id", "resource"+i);
-									resource.innerHTML = d.prov_resource[i]._name;
-									resources.appendChild(resource);
-								}
-							} else { // display only one resource
-								var resource = document.createElement("div");
-								resource.setAttribute("id", "resource");
-								resource.innerHTML = d.prov_resource._name;
-								resources.appendChild(resource);								
+							//d3.select(this).attr("size", SELECTED_NODE_RADIUS);
+							d3.select(this).attr("d", d3.svg.symbol().size(SELECTED_NODE_SIZE));
+
+							// activate display box
+							document.getElementById("selected_action").style.visibility = "visible";
+				
+							// display name
+							document.getElementById("selected_action_name").innerHTML = d.action._name;
+				
+							// display state with colour
+							document.getElementById("selected_action_state").innerHTML = d.action._state;
+							document.getElementById("selected_action_state").style.color = get_state_colour(d);
+				
+							// display script
+							document.getElementById("selected_action_script").innerHTML = d.action.script;
+
+							// clear previous action buttons
+							var buttons = document.getElementById("action_buttons");
+							if (buttons != null) {
+								buttons.parentNode.removeChild(buttons);
 							}
+							// clear previously listed resources
+							var resources = document.getElementById("req_resources");
+							if (resources != null) {
+								resources.parentNode.removeChild(resources);
+							}
+							var resources = document.getElementById("prov_resources");
+							if (resources != null) {
+								resources.parentNode.removeChild(resources);
+							}
+
+							// display required resoures
+							var resources = document.createElement("div");
+							resources.setAttribute("id", "req_resources");
+							resources.innerHTML = "<br /> Required Resoures:";
+							document.getElementById("selected_action").appendChild(resources);
+							if (d.action.req_resource != null) {
+								if (d.action.req_resource.length >= 2) { // display list of resources
+									for (var i = 0; i < d.action.req_resource.length; i++) {
+										var resource = document.createElement("div");
+										resource.setAttribute("id", "resource"+i);
+										resource.innerHTML = d.action.req_resource[i]._name;
+										resources.appendChild(resource);
+									}
+								} else { // display only one resource
+									var resource = document.createElement("div");
+									resource.setAttribute("id", "resource");
+									resource.innerHTML = d.action.req_resource._name;
+									resources.appendChild(resource);								
+								}
+							}
+
+							// display provided resoures
+							var resources = document.createElement("div");
+							resources.setAttribute("id", "prov_resources");
+							resources.innerHTML = "<br /> Provided Resoures:";
+							document.getElementById("selected_action").appendChild(resources);
+							if (d.action.prov_resource != null) {
+								if (d.action.prov_resource.length >= 2) { // display list of resources
+									for (var i = 0; i < d.action.prov_resource.length; i++) {
+										var resource = document.createElement("div");
+										resource.setAttribute("id", "resource"+i);
+										resource.innerHTML = d.action.prov_resource[i]._name;
+										resources.appendChild(resource);
+									}
+								} else { // display only one resource
+									var resource = document.createElement("div");
+									resource.setAttribute("id", "resource");
+									resource.innerHTML = d.action.prov_resource._name;
+									resources.appendChild(resource);								
+								}
+							}
+
+							// display button
+							createActionButtons(d.action);
+
+							prev_click = this;
 						}
-
-						// display button
-						createActionButtons(d);
-
-						prev_click = this;
 					})
 					.call(force.drag);
 
 				node.append("title")
-				  .text(function(d) { return d._name; });
+				  .text(function(d) {
+				  	if (d.action != null) {return d.action._name;}
+				  	else if (d.decision != null) {return "DECISION";}
+				  	else if (d.marker != null) {return d.marker.name;}
+				  	else {return "";}
+				  });
 
 				
 
 				force.on("tick", function() {
+					svg.selectAll("path")
+      					.attr("transform", function(d) { 
+      						if (d.x < 0) d.x = 0;
+      						if (d.x > width) d.x = width;
+      						if (d.y < 0) d.y = 0;
+      						if (d.y > height) d.y = height;
+      						return "translate(" + d.x + "," + d.y + ")"; 
+      					});
+
+					node.attr("cx", function(d) { return d.x; })
+						.attr("cy", function(d) { return d.y; });
+
 					link.attr("x1", function(d) { return d.source.x; })
 						.attr("y1", function(d) { return d.source.y; })
 						.attr("x2", function(d) { return d.target.x; })
 						.attr("y2", function(d) { return d.target.y; });
 
-					node.attr("cx", function(d) { return d.x; })
-						.attr("cy", function(d) { return d.y; });
 				});
 
 			}
@@ -522,25 +702,37 @@ Actions:
 	
 
 	var force = d3.layout.force()
-		
+		.gravity(0)
+		.linkDistance(0.01)
+		.linkStrength(1.0)		
 		.size([width, height]);
 
 	var svg = d3.select("#pathview").append("svg")
 		.attr("width", width)
-		.attr("height", height);
+		.attr("height", height)
+		.append("g")
+			.call(zm =d3.behavior.zoom().scaleExtent([1,3]).on("zoom", redraw)).on("dblclick.zoom", null);
+			//.call(drag);
+
 
 	var drag = force.drag()
-		.on("dragstart", dragstart); 
+		.origin(function(d) { return d; })
+		.on("dragstart", dragstart)
+		.on("drag", drag)
+		.on("dragend", dragend);
+
 
 	// draw grey background
-	svg.append("rect")
-		.attr("width", "100%")
-		.attr("height", "100%")
+	var rect = svg.append("rect")
+		.attr("width", width)
+		.attr("height", height)
 		.attr("fill", "lightgrey")
 		.on("click", function() {
 			// resize last circle clicked on
 			if (typeof(prev_click) != "undefined") {
-				d3.select(prev_click).attr("r", NODE_RADIUS);
+				//d3.select(prev_click).attr("size", NODE_RADIUS);
+				d3.select(prev_click).attr("d", d3.svg.symbol().size(NODE_SIZE));
+				
 				prev_click = null;
 			}
 			
@@ -557,9 +749,50 @@ Actions:
 		});
 
 	function dragstart(d) {
+		d3.event.sourceEvent.stopPropagation();
+   		d3.select(this).classed("dragging", true);
 		d3.select(this).classed("fixed", d.fixed = true);
 	} 
+
+	function drag(d) {
+		d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
+	}
+
+	function dragend(d) {
+		d3.select(this).classed("dragging", false);
+	}
 	
+	var zoom = d3.behavior.zoom().on("zoom",function(){
+  var t = d3.event.translate;
+  var s = d3.event.scale;
+  svg.selectAll("rect").attr("transform","translate("+t[0]+","+t[1]+") scale("+s+")")  
+}).scaleExtent([1,10]);
+
+	function redraw() {
+		//node.attr("font-size", (nodeFontSize / d3.event.scale) + "px");
+		//svg.selectAll("path").attr("d", d3.svg.symbol().size(function(d) { return NODE_SIZE/d3.event.scale; }));
+
+		// var tx = d3.event.translate[0];
+		// var ty = d3.event.translate[1];
+
+		// console.log(svg.node().getBoundingClientRect());
+
+		// var svg_width = svg.node().getBoundingClientRect().width;
+		// var svg_height = svg.node().getBoundingClientRect().height;
+
+		// if (tx > 0) tx = 0;
+		// if (tx+width < svg_width) tx = svg_width-width;
+		// if (ty > 0) ty = 0;
+		// if (ty+height < svg_height) ty = svg_height-height;
+
+		// d3.event.translate = [tx, ty];
+
+		svg.attr("transform",
+			"translate(" + d3.event.translate + ")"
+			+ " scale(" + d3.event.scale + ")");
+
+	}
+
 	</script>
 
 	<svg id="something_important_for_arrows">
@@ -572,9 +805,6 @@ Actions:
 	
 </div>
 
-<br>
-<center>
-<a href="../pathways.php?pid=<?php echo $pid ?>">Patient Pathway List</$
-</center>
+
 
 </body>
