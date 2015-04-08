@@ -80,6 +80,8 @@ Dependencies
 
     python2.7
 
+These tests ensure that our pathway view has been properly installed in OpenEMR.
+
 To run:
 * Navigate to the root folder of the repository
 * Run: `python test/httptest.py`
