@@ -45,8 +45,8 @@ Libraries:
 
 Full Listing of libraries on Ubuntu(14.04):  `sudo apt-get install apache2-mpm-prefork mysql-server libapache2-mod-php5 libdate-calc-perl libdbd-mysql-perl libdbi-perl libhtml-parser-perl libtiff-tools libwww-mechanize-perl libxml-parser-perl php5 php5-mysql php5-cli php5-gd php5-xsl php5-curl php5-mcrypt php-soap imagemagick php5-json `
 
-### OpenEMR and Pathways Installation
-
+### Installation
+#### OpenEMR
 * Download and Run OpenEMR .deb installer from here: http://sourceforge.net/projects/openemr/files/OpenEMR%20Ubuntu_debian%20Package/4.1.2.7/openemr_4.1.2-3_all.deb/download
 * This installs 'openemr' folder into webroot
 * This folder will have to have read/write/execute capabilities by the webserver so chown-ing the openemr folder to the webserver will be nessecary (The required commands will be webserver and platform dependant):
@@ -54,6 +54,9 @@ Full Listing of libraries on Ubuntu(14.04):  `sudo apt-get install apache2-mpm-p
 * Browse to http://localhost.com/openemr
 * Follow the instructions given 
 * For more info go to [Openemr Installation Instructions](http://www.open-emr.org/wiki/index.php/OpenEMR_4.2.0_Linux_Installation)
+
+#### Pathways
+* Copy the openemr/ folder from the root directory of this repo to webroot
  
 ### Features
 Below we will describe each feature on our backlog and how to use it.
