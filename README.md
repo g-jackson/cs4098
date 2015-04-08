@@ -60,10 +60,12 @@ Below we will describe each feature on our backlog and how to use it.
 ##### Real EMR interface
 Our pathway system integrates directly into OpenEMR which is a real EMR interface. We describe how to install and access OpenEMR in the OpenEMR Installation section above.
 ##### XML parsing
+The peos generates a xml listing of the current processes that are running, representing pathways. We parse this XML and display it both as a graph and table interface.
 ##### Task list
 ##### Basic pathway graph view
 ##### Pan and zoom
 ##### Kernel interface
+We use php to make calls to the peos. Our interface allows new pathways to be added and viewed on a per patient basis.
 ##### Resource access
 We currently do not support this feature.
 ##### Refined graph view
