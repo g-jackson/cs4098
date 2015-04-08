@@ -7,7 +7,8 @@ A project for CS4098 to demonstrate the use of the peos system with pml in a med
 To install the project the following steps must be taken. Further detail on each step is below.
 * Downlading this repository 
 * Downloading and making the peos kernel from the jnoll/peos repository
-* Installing OpenEMR provided in this repository (Version 4.2.0 with modifications in order to add pathway support)
+* Installing OpenEMR available at http://www.open-emr.org/ (Version 4.2.0 with modifications in order to add pathway support)
+* Overwriting OpenEMR files with the openemr folder provided in our repository
 
 ### Requirements for the PEOS Kernel
 * Clone the repository at http://github.com/jnoll/peos
@@ -44,12 +45,13 @@ Libraries:
 
 Full Listing of libraries on Ubuntu(14.04):  `sudo apt-get install apache2-mpm-prefork mysql-server libapache2-mod-php5 libdate-calc-perl libdbd-mysql-perl libdbi-perl libhtml-parser-perl libtiff-tools libwww-mechanize-perl libxml-parser-perl php5 php5-mysql php5-cli php5-gd php5-xsl php5-curl php5-mcrypt php-soap imagemagick php5-json `
 
-### OpenEMR Installation
+### OpenEMR and Pathways Installation
 
-* Copy files from openemr folder to your webserver's root folder
-* ` cp <repo-directory>/openemr /var/www/html/ -rf`
+* Download and Run OpenEMR .deb installer
+* This installs copy's 'openemr' folder into webroot
+* Copy the "openemr" folder provided in the repository into the webroot. This will integrate pathway support into newly installed OpenEMR
 * This folder will have to have read/write/execute capabilities by the webserver so chown-ing the openemr folder to the webserver will be nessecary (The required commands will be webserver and platform dependant):
-* ` chown www-data openemr`
+* `sudo chown -R www-data openemr`
 * Browse to http://localhost.com/openemr
 * Follow the instructions given 
 * When the installation is finished, OpenEMR should direct you to the login page. If you are instead directed to the start of the setup again, you have to manually change the config file openemr/sites/default/sqlconf.php and on line 27 set $config to equal 1 instead of 0.
