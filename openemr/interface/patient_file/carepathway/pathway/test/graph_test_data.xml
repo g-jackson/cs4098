@@ -1,0 +1,201 @@
+<process_table>
+<process pid="0" model="./pml/proc_test.pml" status="2">
+<iteration>
+<action name="login_as_testuser" state="BLOCKED">
+<script>
+&quot;Login to test host as $test_user.&quot;
+</script>
+<req_resource name="test_user" value="&quot;\${test_user}&quot;" qualifier=""></req_resource>
+</action>
+<action name="delete_old_workspace" state="NONE">
+<script>
+&quot;Run `cvs release $working_dir; rm -r $working_dir.&quot;
+</script>
+<req_resource name="working_dir" value="&quot;\${working_dir}&quot;" qualifier=""></req_resource>
+</action>
+<action name="checkout_workspace" state="AVAILABLE">
+<script>
+&quot;Run `cvs checkout $test_module'.&quot;
+</script>
+<prov_resource name="working_dir" value="&quot;\${working_dir}&quot;" qualifier=""></prov_resource>
+</action>
+<action name="run_tests" state="NONE">
+<script>
+&quot;Run `make test' in `$working_dir/src' directory.&quot;
+</script>
+<req_resource name="working_dir" value="&quot;\${working_dir}&quot;" qualifier=""></req_resource>
+</action>
+</iteration>
+<action name="update_status_report" state="BLOCKED">
+<script>
+&quot;If all tests passed, you are finished; add this to your
+list of accomplishments for today. If not, go back and fix any
+failures uncovered.&quot;
+</script>
+<req_resource name="working_dir" value="&quot;\${working_dir}&quot;" qualifier=""></req_resource>
+</action>
+<action name="complete_commit" state="NONE">
+<script>
+&quot;You are finished. Get a cup of coffee!&quot;
+</script>
+<req_resource name="working_dir" value="&quot;\${working_dir}&quot;" qualifier=""></req_resource>
+</action>
+</process>
+<process pid="1" model="./pml/simple.pml" status="2">
+<action name="act_1" state="BLOCKED">
+<script>
+(null)
+</script>
+<req_resource name="r1" value="&quot;\${r1}&quot;" qualifier=""></req_resource>
+<prov_resource name="r2" value="&quot;\${r2}&quot;" qualifier=""></prov_resource>
+</action>
+<action name="act_2" state="NONE">
+<script>
+(null)
+</script>
+<req_resource name="r2" value="&quot;\${r2}&quot;" qualifier=""></req_resource>
+<prov_resource name="r2" value="&quot;\${r2}&quot;" qualifier=""></prov_resource>
+</action>
+</process>
+<process pid="3" model="./pml/simpler.pml" status="2">
+<action name="act_1" state="BLOCKED">
+<script>
+(null)
+</script>
+<req_resource name="r1" value="&quot;\${r1}&quot;" qualifier=""></req_resource>
+<prov_resource name="r2" value="&quot;\${r2}&quot;" qualifier=""></prov_resource>
+</action>
+</process>
+<process pid="4" model="./pml/run_peos.pml" status="2">
+<action name="checkout" state="BLOCKED">
+<script>
+&quot;cvs -d $repository checkout peos-test&quot;
+</script>
+<req_resource name="repository" value="&quot;\${repository}&quot;" qualifier=""></req_resource>
+<prov_resource name="workspace" value="&quot;\${workspace}&quot;" qualifier=""></prov_resource>
+</action>
+<action name="check_tcltk" state="AVAILABLE">
+<script>
+&quot;Check if '/home/jntestuser/tcl_install/include/tcl.h' exists.  If not change machine.&quot;
+</script>
+</action>
+<action name="goto_kernel_dir" state="NONE">
+<script>
+&quot;run 'cd $workspace/src/os/kernel'&quot;
+</script>
+<req_resource name="workspace" value="&quot;\${workspace}&quot;" qualifier=""></req_resource>
+</action>
+<iteration>
+<action name="build_kernel" state="NONE">
+<script>
+&quot;run make&quot;
+</script>
+<req_resource name="workspace" value="&quot;\${workspace}&quot;" qualifier=""></req_resource>
+</action>
+<action name="fix_kernel_failures" state="AVAILABLE">
+<script>
+&quot;fix any failures&quot;
+</script>
+</action>
+</iteration>
+<selection>
+<sequence>
+<action name="goto_gtk_dir" state="NONE">
+<script>
+&quot;run 'cd $workspace/src/ui/GUI'&quot;
+</script>
+<req_resource name="workspace" value="&quot;\${workspace}&quot;" qualifier=""></req_resource>
+</action>
+<iteration>
+<action name="build_gtk_app" state="NONE">
+<script>
+&quot;run make&quot;
+</script>
+<req_resource name="workspace" value="&quot;\${workspace}&quot;" qualifier=""></req_resource>
+</action>
+<action name="fix_gtk_failures" state="AVAILABLE">
+<script>
+&quot;fix any failures&quot;
+</script>
+</action>
+</iteration>
+<action name="run_gtk_app" state="NONE">
+<script>
+&quot;run ./gtkpeos&quot;
+</script>
+<req_resource name="workspace" value="&quot;\${workspace}&quot;" qualifier=""></req_resource>
+</action>
+</sequence>
+<sequence>
+<action name="goto_gtk_dir" state="NONE">
+<script>
+&quot;run 'cd $workspace/src/ui/java-gui'&quot;
+</script>
+<req_resource name="workspace" value="&quot;\${workspace}&quot;" qualifier=""></req_resource>
+</action>
+<action name="set_java_env" state="AVAILABLE">
+<script>
+&quot;
+                        run . /etc/profile
+                        run setup jdk-1.4.0
+                        run export CLASSPATH=/home/jnoll/lib/xmlParserAPIs.jar:/home/jnoll/lib/junit/junit.jar:/home/jnoll/lib/xercesImpl.jar&quot;
+</script>
+</action>
+<iteration>
+<action name="build_java_app" state="NONE">
+<script>
+&quot;run make&quot;
+</script>
+<req_resource name="workspace" value="&quot;\${workspace}&quot;" qualifier=""></req_resource>
+</action>
+<action name="fix_java_failures" state="AVAILABLE">
+<script>
+&quot;fix any failures&quot;
+</script>
+</action>
+</iteration>
+<action name="run_java_app" state="NONE">
+<script>
+&quot;run ./runpeos&quot;
+</script>
+<req_resource name="workspace" value="&quot;\${workspace}&quot;" qualifier=""></req_resource>
+</action>
+</sequence>
+<sequence>
+<action name="goto_web_dir" state="NONE">
+<script>
+&quot;run 'cd $workspace/src/ui/web2'&quot;
+</script>
+<req_resource name="workspace" value="&quot;\${workspace}&quot;" qualifier=""></req_resource>
+</action>
+<action name="set_html_dir" state="NONE">
+<script>
+&quot;run export HTML_DIR=$html_dir&quot;
+</script>
+<req_resource name="html_dir" value="&quot;\${html_dir}&quot;" qualifier=""></req_resource>
+</action>
+<iteration>
+<action name="build_web_app" state="NONE">
+<script>
+&quot;run make install&quot;
+</script>
+<req_resource name="workspace" value="&quot;\${workspace}&quot;" qualifier=""></req_resource>
+</action>
+<action name="fix_web_failures" state="AVAILABLE">
+<script>
+&quot;fix any failures&quot;
+</script>
+</action>
+</iteration>
+<action name="run_web_app" state="NONE">
+<script>
+&quot;
+                        run a web browser
+                        goto $peos_url&quot;
+</script>
+<req_resource name="peos_url" value="&quot;\${peos_url}&quot;" qualifier=""></req_resource>
+</action>
+</sequence>
+</selection>
+</process>
+</process_table>

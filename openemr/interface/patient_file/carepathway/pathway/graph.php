@@ -2,28 +2,6 @@
 <meta charset="utf-8">
 <style>
 
-table {
-    width:100%;
-}
-table, th, td {
-    border: 1px solid black;
-    border-collapse: collapse;
-}
-th, td {
-    padding: 5px;
-    text-align: left;
-}
-table#action_list_table tr:nth-child(even) {
-    background-color: #eee;
-}
-table#action_list_table tr:nth-child(odd) {
-   background-color:#fff;
-}
-table#action_list_table th	{
-    background-color: #FFAC84;
-    color: black;
-}
-
 #pathview {
 	position: relative;
 	width: 960px;
@@ -65,6 +43,8 @@ marker#arrow {
 
 	<script src="../javascripts/d3.min.js"></script>
 	<script src="../javascripts/xml2json.min.js"></script>
+
+	<script src="xml_action_parsing.js"></script>
 </head>
 
 <body>
@@ -78,11 +58,14 @@ marker#arrow {
 ?>
 </div>
 
+<div id="return_link">
 <?php 
 $retour .= "<a href='../pathways.php?pid=".$pid."'>Back to Patient Pathway List</a>";
 echo $retour;
 ?>
+</div>
 <br/>
+
 
 <script>
 	var div = document.getElementById("dom-target");
@@ -100,25 +83,10 @@ echo $retour;
 
 <br/>
 <br/>
-<div id="action_list" >
-Actions:
 
-<table id="action_list_table">
-<thead>
-	<tr>
-		<th onclick="listActionsByName()">Name</th>
-		<th onclick="listActionsByState()">State</th>		
-	</tr>
-</thead>
-<tbody id="action_list_table_body">
-	<tr>
-		<td>test name</td>
-		<td>test state</td>		
-	</tr>
-</tbody>
-</table>
-
-</div>
+<?php 
+	include 'action_list.php';
+?>
 <br/>
 
 <div id="pathview">
@@ -129,9 +97,9 @@ Actions:
 		<br/>
 		Script:
 		<div id="selected_action_script"></div>
-	</div>
+	</div>	
 
-
+	
 
 	<script>
 	var x2js = new X2JS();
@@ -152,26 +120,6 @@ Actions:
 
 	var actions = [];
 	var links = [];
-
-	function get_state_colour(d) {
-		if (d.action != null) {
-			if (d.action._state == "BLOCKED") {
-				return "red";
-			} else if (d.action._state == "AVAILABLE") {
-				return "orange";
-			} else if (d.action._state == "READY") {
-				return "yellow";							
-			} else if (d.action._state == "COMPLETE") {
-				return "green";
-			} else {
-				return "grey";
-			}
-		} else if (d.decision != null) {
-			return "black";
-		}
-
-		return "black";
-	}
 
 	function createActionButtons(d) {
 		var button_div = document.createElement("div");
@@ -199,297 +147,6 @@ Actions:
 	    document.getElementById("selected_action").appendChild(button_div);
 	}
 
-	function addLinks(links, new_links, offset) {
-		for (var i = 0; i < new_links.length; i++) {
-			var link = {};
-			if (new_links[i].source === undefined) {
-				alert('found it!');
-			}
-			link.source = new_links[i].source + offset;
-			link.target = new_links[i].target + offset;
-			links.push(link);	
-		}
-	}
-
-	function branch(process_data, actions, links) {
-		if (process_data == null) {
-			return [];
-		}
-
-		var last_selection_nodes = [];
-		// add decision node to start of selection
-		var branch_start_node;
-		if (link_stack.length >= 1) {
-			branch_start_node = link_stack.pop();
-		} else {
-			alert("this shouldn't happen.. I think");
-			return;
-		}
-
-  		var x = process_data.childNodes;
-  		
-		for (var i = 0; i < x.length; i++) {
-			if (x[i].nodeName === "action") {
-				
-				var xml_string = new XMLSerializer().serializeToString(x[i]);
-				var action = x2js.xml_str2json(xml_string);
-				// actions.push(action);
-				
-				// if (link_stack.length >= 1) {
-				// 	var link = {};
-				// 	link.source = branch_start_node;					
-				// 	link.target = actions.length-1;
-				// 	links.push(link);
-				// }
-
-				// last_selection_nodes.push(actions.length-1);
-
-			} else if (x[i].nodeName === "sequence") {
-
-				var sequence_nodes = [];
-				var sequence_links = [];
-
-				// add link from decision node to current sequence
-				link_stack.push(branch_start_node-actions.length);
-
-				parseActions(x[i], sequence_nodes, sequence_links);
-
-
-				if (sequence_nodes.length >= 1) {
-					//alert(JSON.stringify(sequence_nodes));
-					addLinks(links, sequence_links, actions.length);
-					actions.push.apply(actions, sequence_nodes);
-
-					last_selection_nodes.push(actions.length-1);
-				}
-			}
-		}
-
-		// add node to end of branch
-		var node = {};
-		node.marker = {};
-		node.marker.name = "END_BRANCH_MARKER";
-		actions.push(node);
-		var selection_end_node = actions.length-1;
-
-		// add links to node at end of branch
-		for (var j = 0; j < last_selection_nodes.length; j++) {
-			var link = {};
-			link.source = last_selection_nodes[j];
-			link.target = selection_end_node;
-			links.push(link);
-		}
-
-		link_stack.push(selection_end_node);
-	}
-
-	function selection(process_data, actions, links) {
-		if (process_data == null) {
-			return [];
-		}
-
-		// add decision node to start of selection
-		var node = {};
-		node.decision = {};
-		actions.push(node);
-		var decision_node = actions.length-1;
-		var last_selection_nodes = [];
-		
-
-		// add link to decision node
-		if (link_stack.length >= 1) {
-			var link = {};
-			link.source = link_stack.pop();
-			link.target = decision_node;
-			links.push(link);
-		}
-
-  		var x = process_data.childNodes;
-  		
-		for (var i = 0; i < x.length; i++) {
-			if (x[i].nodeName === "action") {
-				
-				var xml_string = new XMLSerializer().serializeToString(x[i]);
-				var action = x2js.xml_str2json(xml_string);
-				// actions.push(action);
-				
-				// if (link_stack.length >= 1) {
-				// 	var link = {};
-				// 	link.source = decision_node;					
-				// 	link.target = actions.length-1;
-				// 	links.push(link);
-				// }
-
-				// last_selection_nodes.push(actions.length-1);
-
-			} else if (x[i].nodeName === "sequence") {
-
-				var sequence_nodes = [];
-				var sequence_links = [];
-
-				// add link from decision node to current sequence
-				link_stack.push(decision_node-actions.length);
-
-				parseActions(x[i], sequence_nodes, sequence_links);
-
-
-				if (sequence_nodes.length >= 1) {
-					//alert(JSON.stringify(sequence_nodes));
-					addLinks(links, sequence_links, actions.length);
-					actions.push.apply(actions, sequence_nodes);
-
-					last_selection_nodes.push(actions.length-1);
-				}
-			}
-		}
-
-		// add node to end of selection
-		var node = {};
-		node.marker = {};
-		node.marker.name = "END_SELECTION_MARKER";
-		actions.push(node);
-		var selection_end_node = actions.length-1;
-
-		// add links to node at end of selection
-		for (var j = 0; j < last_selection_nodes.length; j++) {
-			var link = {};
-			link.source = last_selection_nodes[j];
-			link.target = selection_end_node;
-			links.push(link);
-		}
-
-		link_stack.push(selection_end_node);
-	}
-
-	var link_stack = [];
-	function parseActions(process_data, actions, links) {
-		if (process_data == null) {
-			return [];
-		}
-
-  		var x = process_data.childNodes;
-  		
-		for (var i = 0; i < x.length; i++) {
-			if (x[i].nodeName === "action") {
-				
-				var xml_string = new XMLSerializer().serializeToString(x[i]);
-				var action = x2js.xml_str2json(xml_string);
-				actions.push(action);
-				
-				if (link_stack.length >= 1) {
-					var link = {};
-					link.source = link_stack.pop();					
-					link.target = actions.length-1;
-					links.push(link);
-				}
-
-				link_stack.push(actions.length-1);
-
-			} else if (x[i].nodeName === "branch") {
-
-				branch(x[i], actions, links);
-
-			} else if (x[i].nodeName === "selection") {
-
-				selection(x[i], actions, links);
-
-			} else if (x[i].nodeName === "iteration") {
-
-				var iteration_start = actions.length;
-
-				// retrieve actions from within iteration
-				parseActions(x[i], actions, links);
-
-				// add decision node to end of iteration
-				var node = {};
-				node.decision = {};
-				actions.push(node);
-
-				// add link to decision node from end of iteration
-				if (link_stack.length >= 1) {
-					var link = {};
-					link.source = link_stack.pop();
-					link.target = actions.length-1;
-					links.push(link);
-				}
-
-				// add link back to start of iteration
-				var link = {};
-				link.source = actions.length-1;
-				link.target = iteration_start;
-				links.push(link);
-
-				link_stack.push(actions.length-1);
-
-			} else if (x[i].nodeName === "sequence") {
-
-				parseActions(x[i], actions, links);
-			}
-		}
-
-	}
-
-	var listed_as = "";
-	function listActionsByName() {
-
-		var Arr = actions.slice(0);
-		if (listed_as === "name_a2z") {
-			Arr.sort(function(a, b){ return a.action === undefined ? 1 : b.action === undefined ? -1 : b.action._name.localeCompare(a.action._name); });
-			listed_as = "name_z2a";
-		} else if (listed_as === "name_z2a" ) {
-			Arr.sort(function(a, b){ return a.action === undefined ? -1 : b.action === undefined ? 1 : a.action._name.localeCompare(b.action._name); });
-			listed_as = "name_a2z";
-		} else { // default
-			Arr.sort(function(a, b){ return a.action === undefined ? -1 : b.action === undefined ? 1 : a.action._name.localeCompare(b.action._name); });
-			listed_as = "name_a2z";
-		}
-
-	    listActionsInTable(Arr);
-	};
-
-	function listActionsByState() {
-		
-		var Arr = actions.slice(0);
-		if (listed_as === "state_a2z") {
-			Arr.sort(function(a, b){ return a.action === undefined ? 1 : b.action === undefined ? -1 : b.action._state.localeCompare(a.action._state); });
-			listed_as = "state_z2a";
-		} else if (listed_as === "state_z2a" ) {
-			Arr.sort(function(a, b){ return a.action === undefined ? -1 : b.action === undefined ? 1 : a.action._state.localeCompare(b.action._state); });
-			listed_as = "state_a2z";
-		} else { // default
-			Arr.sort(function(a, b){ return a.action === undefined ? -1 : b.action === undefined ? 1 : a.action._state.localeCompare(b.action._state); });
-			listed_as = "state_a2z";
-		}
-
-		listActionsInTable(Arr);	    
-	};
-
-	function listActionsInTable(actions) {
-		if (actions == null) {
-			return;
-		}
-
-		var tbody = document.createElement('tbody');
-		tbody.setAttribute("id", "action_list_table_body");
-
-		for (var i = 0; i < actions.length; i++) {
-			if (actions[i].action != null) {
-				tr = document.createElement('tr');
-				td = document.createElement('td');
-				td.appendChild(document.createTextNode(actions[i].action._name))
-				tr.appendChild(td)
-				td = document.createElement('td');
-				td.appendChild(document.createTextNode(actions[i].action._state))
-				td.style.color = get_state_colour(actions[i]);
-				tr.appendChild(td)
-				tbody.appendChild(tr);
-			}
-		}
-
-		var old_tbody = document.getElementById("action_list_table_body");
-		old_tbody.parentNode.replaceChild(tbody, old_tbody)
-	}
-
 
 
 	function load_path_data(id) {
@@ -505,30 +162,21 @@ Actions:
 				var xmlData=xmlhttp.responseXML.documentElement;
 				
 				var x = xmlData.getElementsByTagName("process");
-				//alert(x.length);				
 
 				var proc_data;
-				for (i = 0; i < x.length; i++){
+				for (var i = 0; i < x.length; i++){
 					if (x[i].getAttribute("pid") === id) {
 						proc_data = x[i];
 					}
 				}
 				//alert(proc_data.getAttribute("model"));					
 
-				var xml_string = new XMLSerializer().serializeToString(xmlhttp.responseXML.documentElement);
-				var proc_table = x2js.xml_str2json(xml_string);
 
-				var process_data;
-				if (proc_table.process_table.process.length >= 2) {
-					process_data = proc_table.process_table.process[id];
-				} else {
-					process_data = proc_table.process_table.process;
-				}
 
 				actions = [];
 				links = [];
 				parseActions(proc_data, actions, links);
-				//alert(JSON.stringify(actions));
+				//alert(JSON.stringify(links));
 
 				listActionsInTable(actions);
 
@@ -762,11 +410,6 @@ Actions:
 		d3.select(this).classed("dragging", false);
 	}
 	
-	var zoom = d3.behavior.zoom().on("zoom",function(){
-  var t = d3.event.translate;
-  var s = d3.event.scale;
-  svg.selectAll("rect").attr("transform","translate("+t[0]+","+t[1]+") scale("+s+")")  
-}).scaleExtent([1,10]);
 
 	function redraw() {
 		//node.attr("font-size", (nodeFontSize / d3.event.scale) + "px");
