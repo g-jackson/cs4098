@@ -18,7 +18,7 @@ To install the project the following steps must be taken. Further detail on each
 * This compiled executable is the only part of the peos repository that this project requires. 
 
 ### Requirements for OpenEMR
-To install openEMR on an Ubunutu 14.04 build the following dependancies must be met from the  [Openemr Dependancy Page](http://www.open-emr.org/wiki/index.php/OpenEMR_System_Architecture#OpenEMR_Dependencies):
+To install openEMR on an Ubunutu 14.04 build the following dependencies must be met from the  [Openemr Dependency Page](http://www.open-emr.org/wiki/index.php/OpenEMR_System_Architecture#OpenEMR_Dependencies):
 
 Libraries:
 
@@ -47,7 +47,7 @@ Full Listing of libraries on Ubuntu(14.04):  `sudo apt-get install apache2-mpm-p
 
 ### OpenEMR and Pathways Installation
 
-* Download and Run OpenEMR .deb installer (http://sourceforge.net/projects/openemr/files/OpenEMR%20Ubuntu_debian%20Package/4.1.2.7/openemr_4.1.2-3_all.deb/download)
+* Download and Run OpenEMR .deb installer from here: http://sourceforge.net/projects/openemr/files/OpenEMR%20Ubuntu_debian%20Package/4.1.2.7/openemr_4.1.2-3_all.deb/download
 * This installs 'openemr' folder into webroot
 * This folder will have to have read/write/execute capabilities by the webserver so chown-ing the openemr folder to the webserver will be nessecary (The required commands will be webserver and platform dependant):
 * `sudo chown -R www-data openemr`
@@ -74,32 +74,20 @@ We currently do not support this feature.
 ##### Refined graph view
 More information can be displayed within the graph by double clicking on an action node. This will cause a display box to appear in the corner of the graph with useful information such as script, required resources and provided resources. Buttons have also been added to display the future potential of a pathways interface. To hide the display box click on the grey background of the graph.
 
-### Testing Subsystems
-If you are interested in using only some of the subsystems in this project without the installation of openemr
+### Automated Tests
+#### HTTP Tests
+Dependencies
 
-#### Running the pathway view locally without openemr
-* Download and compile the peos kernel from github.com/jnoll/peos
-* Copy the compiled peos executable from peos/os/kernel into openemr/interface/patient_file/carepathway/pathway
-* Copy files from "javascripts" and "path" folders to webserver's root folder
-* ` cp openemr/interface/patient_file/carepathway/pathway/javascripts /var/www/html/ -rf`
-* ` cp openemr/interface/patient_file/carepathway/pathway/pathway /var/www/html/ -rf`
-* Provide permissions for the webserver to r/w/x the files in the folders
-* `chown www-data javascripts`
-* `chown www-data pathway`
-* Opening http://localhost/pathway/patient_table.php will display a listing of all the pathways present
-* From here you can add and view pathways
+    python2.7
 
-#### Tests
-* Dependancies: python2.7
+To run:
+* Navigate to the root folder of the repository
+* Run: `python test/httptest.py`
 
-To run http tests:
-    python test/httptest.py
-
-
-To run tests for the graph, navigate to "http://localhost/openemr/interface/patient_file/carepathway/pathway/test/graph_test.php". 
-
-This page will run two sets of tests.
-
+#### Graph Tests
+For the graph, there are two sets of tests.
 * The first set of tests ensures that graph data is being parsed from xml and is being stored with the correct nodes and links for the graph to display.
-
 * The second set of tests checks that the actions listed in the table above the graph are displayed correctly and that on calling the sort table function the information displayed in the table is correctly sorted.
+
+To run: 
+* Navigate to http://localhost/openemr/interface/patient_file/carepathway/pathway/test/graph_test.php 
