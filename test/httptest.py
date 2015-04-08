@@ -1,6 +1,16 @@
 import urllib2
 
-urls = ["http://localhost/openemr"]
+urls = ["http://localhost/openemr/interface/super/manage_site_files.php",
+
+"http://localhost/openemr/interface/patient_file/summary/demographics.php",
+
+"http://localhost/openemr/interface/patient_file/carepathway/pathways.php",
+
+"http://localhost/openemr/interface/patient_file/carepathway/pathway/addprocess.php",
+
+"http://localhost/openemr/interface/patient_file/carepathway/pathway/addprocesssubmit.php",
+"http://localhost/openemr/interface/patient_file/carepathway/pathway/graph.php"
+]
 
 for url in urls:
     req = urllib2.Request(url)
