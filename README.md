@@ -47,9 +47,9 @@ Full Listing of libraries on Ubuntu(14.04):  `sudo apt-get install apache2-mpm-p
 
 ### OpenEMR and Pathways Installation
 
-* Download and Run OpenEMR .deb installer
-* This installs copy's 'openemr' folder into webroot
-* Copy the "openemr" folder provided in the repository into the webroot. (You may need to have admin permissions to copy to the webroot.) This will integrate pathway support into newly installed OpenEMR
+* Download and Run OpenEMR .deb installer (http://sourceforge.net/projects/openemr/files/OpenEMR%20Ubuntu_debian%20Package/4.1.2.7/openemr_4.1.2-3_all.deb/download)
+* This installs 'openemr' folder into webroot
+* Copy the "openemr" folder, provided in the repository, into the webroot. (You may need to have admin permissions to copy to the webroot.) This will integrate pathway support into newly installed OpenEMR
 * This folder will have to have read/write/execute capabilities by the webserver so chown-ing the openemr folder to the webserver will be nessecary (The required commands will be webserver and platform dependant):
 * `sudo chown -R www-data openemr`
 * Browse to http://localhost.com/openemr
