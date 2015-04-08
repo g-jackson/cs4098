@@ -49,7 +49,7 @@ Full Listing of libraries on Ubuntu(14.04):  `sudo apt-get install apache2-mpm-p
 
 * Download and Run OpenEMR .deb installer
 * This installs copy's 'openemr' folder into webroot
-* Copy the "openemr" folder provided in the repository into the webroot. This will integrate pathway support into newly installed OpenEMR
+* Copy the "openemr" folder provided in the repository into the webroot. (You may need to have admin permissions to copy to the webroot.) This will integrate pathway support into newly installed OpenEMR
 * This folder will have to have read/write/execute capabilities by the webserver so chown-ing the openemr folder to the webserver will be nessecary (The required commands will be webserver and platform dependant):
 * `sudo chown -R www-data openemr`
 * Browse to http://localhost.com/openemr
@@ -64,13 +64,17 @@ Our pathway system integrates directly into OpenEMR which is a real EMR interfac
 ##### XML parsing
 The peos generates a xml listing of the current processes that are running, representing pathways. We parse this XML and display it both as a graph and table interface. To view this functionality login to openemr and go to a patient's file page or create a new one if one does not exist already. There will be a link to the pathway view for that patient which, when clicked, takes you to a table displaying the pathways that the patient has currently. This table view is parsed from the xml in a patients current processes and can be updated by adding new processes. The graph view links from this table also parse the peos's xml file to obtain the graphs' data.
 ##### Task list
+From the patient pathway listing, select a pathway to view. This will take you to a page that displays all of a pathways actions in a neat table. Clicking on the head of a table column will sort the the table by that field. This allows the user to easily find an action by it's name or quickly find available actions.
 ##### Basic pathway graph view
+This is displayed on the same page as the task list. The graph displays pathway actions as circles and decisions (found in selections and iterations) as diamonds. The graph also contains squares. These mark the end of branches and selections. Links are generated based on keywords and action ordering in the xml. This display the flow of activity throught the graph with arrows. The first action can be found at the leftmost point on the graph and the last action at the rightmost. All nodes int eh graph can be repositioned by clicking and draging. The graph also displays the state of actions by colouring nodes by state.
 ##### Pan and zoom
+To zoom on the graph, hover your mouse over the graph and use the mouse scroll-wheel or on a laptop trackpad pinch or splay your fingertips. Click and drag the light-grey background of the graph to pan.
 ##### Kernel interface
 We use php to make calls to the peos. Our interface allows new pathways to be added and viewed on a per patient basis. To view this functionality login to openemr and go to a patient's file page or create a new one if one does not exist already. There will be a link to the pathway view for that patient which, when clicked, takes you to a table displaying the pathways that the patient has currently. The option to add more pathways from here is an interface with the kernel instructing it to add a new process to the peos.
 ##### Resource access
 We currently do not support this feature.
 ##### Refined graph view
+More information can be displayed within the graph by double clicking on an action node. This will cause a display box to appear in the corner of the graph with useful information such as script, required resources and provided resources. Buttons have also been added to display the future potential of a pathways interface. To hide the display box click on the grey background of the graph.
 
 ### Testing Subsystems
 If you are interested in using only some of the subsystems in this project without the installation of openemr
@@ -92,3 +96,12 @@ If you are interested in using only some of the subsystems in this project witho
 
 To run http tests:
     python test/httptest.py
+
+
+To run tests for the graph, navigate to "http://localhost/openemr/interface/patient_file/carepathway/pathway/test/graph_test.php". 
+
+This page will run two sets of tests.
+
+* The first set of tests ensures that graph data is being parsed from xml and is being stored with the correct nodes and links for the graph to display.
+
+* The second set of tests checks that the actions listed in the table above the graph are displayed correctly and that on calling the sort table function the information displayed in the table is correctly sorted.
