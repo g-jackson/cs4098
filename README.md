@@ -90,4 +90,5 @@ For the graph, there are two sets of tests.
 * The second set of tests checks that the actions listed in the table above the graph are displayed correctly and that on calling the sort table function the information displayed in the table is correctly sorted.
 
 To run: 
-* Navigate to http://localhost/openemr/interface/patient_file/carepathway/pathway/test/graph_test.php 
+* Navigate to [http://localhost/openemr/interface/patient_file/carepathway/pathway/test/graph_test.php](http://localhost/openemr/interface/patient_file/carepathway/pathway/test/graph_test.php)
+* This page runs both sets of tests and displays the results
